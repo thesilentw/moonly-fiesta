@@ -1,0 +1,5 @@
+#include "script/laspistol.dec"
+#include "script/chainrail.dec"
+#include "script/gowshotgun.dec"
+
+//EOF
