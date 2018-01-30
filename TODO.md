@@ -18,7 +18,6 @@ conerifle:
 
 
 laspistol:
-	charging system needs rewrite
 	sprites need to be reexported at smaller size
 
 
@@ -30,3 +29,7 @@ lasrifle:
 spinrifle:
 	next on the docket
 	fires ball-bearings, with ricochets
+
+beedoken
+	what
+	I blame yholl and marrub
