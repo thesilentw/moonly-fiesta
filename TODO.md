@@ -9,7 +9,7 @@ beamgun:
 	lightning gun, flamer experiments
 
 
-chainrail:
+chainrail: ALPHA
 	fix sprites and reexport
 
 
@@ -17,8 +17,8 @@ conerifle:
 	lol what even is this
 
 
-laspistol:
-	sprites need to be reexported at smaller size
+laspistol: ALPHA
+	sprites need to be re-exported at smaller size
 
 
 lasrifle:
@@ -30,6 +30,5 @@ spinrifle:
 	next on the docket
 	fires ball-bearings, with ricochets
 
-beedoken
-	what
-	I blame yholl and marrub
+beedoken: ALPHA
+	Needs sprite/offset cleanup

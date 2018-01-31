@@ -1,0 +1,122 @@
+/* why am I doing this
+
+IT SHOOTS BEES OK
+
+Sprite Index:
+	BEES ABCDE - Bee cloud
+	BDKP A - Pickup sprite
+	BDKN A - Idle
+	BC - Prefire dropping down
+	DEFGH - Starting charge
+	IJKM - Charge loop 1
+	L - Fire
+*/
+ACTOR Beedoken : Weapon {
+	inventory.pickupMessage "Did that just... sting me? ...my hand feels wierd."
+	weapon.ammoType "none"
+	weapon.ammoUse "0"
+	weapon.slotNumber "6"
+	weapon.ammogive "1"
+
+	states {
+		Spawn:
+			BDKP A 1
+			Loop
+		
+		Ready:
+			TNT1 A 0 A_TakeInventory("BeeCharge", 0x7FFFFFFF)
+			BDKN A 1 A_WeaponReady
+			Loop
+		
+		Select:
+			BDKN A 1 A_Raise
+			Loop
+		
+		Deselect:
+			BDKN A 1 A_Lower
+			Loop
+		
+		Fire:
+			BDKN B 3 A_StopSound(CHAN_WEAPON)
+			BDKN C 5 A_GiveInventory("BeeCharge", 1) //give us some bees to start with
+			Goto PlayChargeStart
+			
+		PlayChargeStart:
+			BDKN D 3 A_PlaySound("weapons/bdkn_chargestart", CHAN_WEAPON, 0.9)
+			BDKN E 3
+			BDKN F 6
+			BDKN G 8
+			BDKN H 6 A_Overlay(-7, "BeeCloud")
+			TNT1 A 0 A_Refire("WaitForRelease")
+			Goto FireBees // since quick shots are the same as normal shot
+			
+		PlayChargeLoop: // this only happens once
+			TNT1 A 0 A_GiveInventory("BeeCharge", 1) // need to add a bee or we get stuck
+			TNT1 A 0 A_PlaySound("weapons/bdkn_chargeloop", CHAN_WEAPON, 0.8, true) // start the looped sound
+			Goto WaitForRelease
+			
+		WaitForRelease:
+			TNT1 A 0 A_JumpIf(((countInv("BeeCharge") < 10) || (countInv("BeeCharge") > 10)) , "GainBees") // if the charge start isn't done yet, don't loop
+			TNT1 A 0 A_JumpIf(countInv("BeeCharge") == 10, "PlayChargeLoop")
+			//
+			// Some shitty math:
+			// The start of the bee sound loop takes 210 ticks @ 35tic/sec
+			// The setup takes 26 tics, so we have 184
+			// That's a hell of a shit divisor, so we fudge it to 180
+			// 180 / numtics(gainbees) = 10
+			// So at 10 'bees', we play the loop and then forget we ever had to do this garbage
+			//
+			//
+			// Also, this state MUST have GainBees and Fire after this so it falls through correctly
+			//
+		GainBees:
+			BDKN I 4 A_GiveInventory("BeeCharge", 1) // you get a bee! YOU get a bee! BEES FOR EVERYONE
+			BDKN M 5 
+			BDKN K 4 
+			BDKN J 5 A_ReFire("WaitForRelease")
+			Goto FireBees
+			
+		FireBees:
+			TNT1 A 0 {
+				A_FireProjectile("BeeShot", 1.5, 0, 0, 0, FPF_TRANSFERTRANSLATION); //goodbye my children
+				A_ClearOverlays(-7,-7);
+			}
+			TNT1 A 0 A_StopSound(CHAN_WEAPON) //stop the loop
+			TNT1 A 0 A_PlaySound("weapons/bdkn_fire")
+			BDKN L 4 A_Light2
+			BDKN L 4 BRIGHT A_Light1
+			BDKN L 4 A_Light0
+			BDKN C 3
+			BDKN B 4
+			Goto Ready
+		
+		BeeCloud:
+			BEES ABCDE 2 Offset(160, 85)
+			Loop
+	}	
+}
+
+ACTOR BeeCharge : Inventory {
+   Inventory.MaxAmount 0x7FFFFFFF //thanks murb
+}
+
+ACTOR BeeShot {
+	Decal DoomImpScorch
+	Radius 8
+	Height 8
+	Speed 25
+	Damage (30)
+	DamageType Bee
+	Scale 0.8
+	Projectile
+	Alpha 1.0
+	DeathSound "weapons/bdkn_impact"
+	States {
+		Spawn:
+			BEES ABCDE 4
+			Loop
+		Death:
+			BAL2 CDE 6 Bright
+		Stop
+	}
+} 

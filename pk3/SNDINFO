@@ -8,8 +8,18 @@ $volume weapons/chrl_rechamber 0.4
 // laser pistol
 weapons/lpst_firebig lpshtbg
 weapons/lpst_chargebeep lpchgbp
+weapons/lpst_chargebeeplevel2 lpchgbp2
+weapons/lpst_chargebeeplevel3 lpchgbp3
+weapons/lpst_chargebeeplevel4 lpchgbp4
+weapons/lpst_chargebeepoverload lpchgbpo
 weapons/lpst_chargestart lpchgst
 weapons/lpst_impact lpimp
 weapons/lpst_reload lprld
 weapons/lpst_fire lpsht
 weapons/lpst_overloadexplosion lpovrxp
+
+//beedoken???
+weapons/bdkn_fire bdknsht
+weapons/bdkn_chargeloop bdknlp
+weapons/bdkn_chargestart bdknlpst
+weapons/bdkn_impact waspdie3
