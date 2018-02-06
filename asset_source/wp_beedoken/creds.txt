@@ -1,3 +1,0 @@
-Sound: Marathon / Realm667 "Spellbinder"
-Bees: Realm667 "Hornet"
-Hands: Realm667 "Spellbinder"
