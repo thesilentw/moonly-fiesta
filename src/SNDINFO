@@ -1,4 +1,3 @@
-// start weapon sounds
 // chainrail
 weapons/chrl_fire1 chrlsht2
 weapons/chrl_rechamber chrlrc5
@@ -24,5 +23,15 @@ weapons/bdkn_impact waspdie3
 weapons/sprf_deploy sprfdply
 weapons/sprf_fire sprfsht
 weapons/sprf_fireloop sprfshtl
-// end weapon sounds
+// lawgiver
+weapons/lg_apselected lgasap
+weapons/lg_seekerselected lgashs
+weapons/lg_hiexselected lgashx
+weapons/lg_incselected lgasin
+weapons/lg_ricoselected lgasrc
+weapons/lg_stdselected lgasst
+weapons/lg_fireauto lgshta
+weapons/lg_firesingle lgshts
+weapons/lg_ammoswitched lgassw
+weapons/lg_deploy lgdply
 // eof

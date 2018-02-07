@@ -3,4 +3,5 @@
 #include "script/gowshotgun.dec"
 #include "script/beedoken.dec"
 #include "script/spinrifle.dec"
+#include "script/lawgiver.dec"
 //EOF

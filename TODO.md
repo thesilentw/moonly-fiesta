@@ -2,6 +2,11 @@
 # TODO
 
 PREALPHA:
+
+Lawgiver mk4:
+	DREDD: YOU BETRAYED THE LAW!
+	RICO: LAWWWWW!
+
 advlasrifle:
 	already used in an existing weapon, maybe skip
 
@@ -28,5 +33,6 @@ spinrifle: ALPHA
 
 beedoken: ALPHA
 	Needs sprite/offset cleanup
+
 	
 //EOF
