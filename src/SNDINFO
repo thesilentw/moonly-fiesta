@@ -34,4 +34,6 @@ weapons/lg_fireauto lgshta
 weapons/lg_firesingle lgshts
 weapons/lg_ammoswitched lgassw
 weapons/lg_deploy lgdply
+weapons/lg_outofammo lgout
+$volume weapons/lg_outofammo 0.8
 // eof

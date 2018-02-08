@@ -2,34 +2,43 @@ ACTOR Lawgiver : Weapon {
 	inventory.pickupMessage "Well, look at that. I must be a Judge."
 	weapon.ammoType "clip"
 	weapon.slotNumber "2"
-	weapon.ammogive "50"
+	weapon.ammogive "10"
 	weapon.upsound "weapons/lg_deploy"
+	weapon.ammouse "1"
+	+weapon.Ammo_Optional
 	
 	states {
 		Spawn:
-			SHOT A -1
+			LAWP A -1
 			Stop
 		Ready:
-			SHTG A 1 A_WeaponReady
+			LAWG A 1 A_WeaponReady
 			Loop
 		Select:
-			SHTG A 1 A_Raise
+			LAWG A 1 A_Raise
 			Loop
 		Deselect:
-			SHTG A 1 A_Lower
+			LAWG A 1 A_Lower
 			Loop
 		Fire:
-			SHTG A 0 A_GunFlash
-			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
-			TNT1 A 0 A_FireBullets(1,1,1,40)
-			SHTG A 2
-			SHTG BCD 3
-			SHTG AAAAAAA 1 A_ReFire 
-			Goto Ready	
-		Flash:
-			SHGF A 4 BRIGHT A_Light2
-			TNT1 A 1 A_Light0
-			Goto LightDone
+			TNT1 A 0 A_JumpIfNoAmmo("NoAmmo")
+			TNT1 A 0 {
+				if (countInv("LawgiverFireMode") == 0) {
+					return state("FireSTD");
+				} else if (countInv("LawgiverFireMode") == 1) {
+					return state("FireAP");
+				} else if (countInv("LawgiverFireMode") == 2) {
+					return state("FireHEAT");
+				} else if (countInv("LawgiverFireMode") == 3) {
+					return state("FireHIEX");
+				} else if (countInv("LawgiverFireMode") == 4) {
+					return state("FireINC");
+				} else if (countInv("LawgiverFireMode") == 5) {
+					return state("FireRICO");
+				} else {
+					return state("NoAmmo");
+				}
+			}
 		AltFire:
 			TNT1 A 0 {
 				if (countInv("LawgiverFireMode") > 4) {
@@ -56,47 +65,108 @@ ACTOR Lawgiver : Weapon {
 			}	
 		SwitchToSTD:
 			TNT1 A 0 A_StopSound(CHAN_WEAPON)
-			SHTG A 10 A_PlaySound("weapons/lg_ammoswitched")
-			SHTG A 1 A_PlaySound("weapons/lg_stdselected")
+			LAWG A 10 A_PlaySound("weapons/lg_ammoswitched")
+			LAWG A 1 A_PlaySound("weapons/lg_stdselected")
 			Goto Ready
 		SwitchToAP:
 			TNT1 A 0 A_StopSound(CHAN_WEAPON)
-			SHTG A 10 A_PlaySound("weapons/lg_ammoswitched")
-			SHTG A 1 A_PlaySound("weapons/lg_apselected")
+			LAWG A 10 A_PlaySound("weapons/lg_ammoswitched")
+			LAWG A 1 A_PlaySound("weapons/lg_apselected")
 			Goto Ready
 		SwitchToHEAT:
 			TNT1 A 0 A_StopSound(CHAN_WEAPON)
-			SHTG A 10 A_PlaySound("weapons/lg_ammoswitched")
-			SHTG A 1 A_PlaySound("weapons/lg_seekerselected")
+			LAWG A 10 A_PlaySound("weapons/lg_ammoswitched")
+			LAWG A 1 A_PlaySound("weapons/lg_seekerselected")
 			Goto Ready
 		SwitchToHIEX:
 			TNT1 A 0 A_StopSound(CHAN_WEAPON)
-			SHTG A 10 A_PlaySound("weapons/lg_ammoswitched")
-			SHTG A 1 A_PlaySound("weapons/lg_hiexselected")
+			LAWG A 10 A_PlaySound("weapons/lg_ammoswitched")
+			LAWG A 1 A_PlaySound("weapons/lg_hiexselected")
 			Goto Ready
 		SwitchToINC:
 			TNT1 A 0 A_StopSound(CHAN_WEAPON)
-			SHTG A 10 A_PlaySound("weapons/lg_ammoswitched")
-			SHTG A 1 A_PlaySound("weapons/lg_incselected")
+			LAWG A 10 A_PlaySound("weapons/lg_ammoswitched")
+			LAWG A 1 A_PlaySound("weapons/lg_incselected")
 			Goto Ready
 		SwitchToRICO:
 			TNT1 A 0 A_StopSound(CHAN_WEAPON)
-			SHTG A 10 A_PlaySound("weapons/lg_ammoswitched")
-			SHTG A 1 A_PlaySound("weapons/lg_ricoselected")
+			LAWG A 10 A_PlaySound("weapons/lg_ammoswitched")
+			LAWG A 1 A_PlaySound("weapons/lg_ricoselected")
 			Goto Ready
 		/*
 		SwitchToAUTO:
 			TNT1 A 0 A_StopSound(CHAN_WEAPON)
-			SHTG A 10 A_PlaySound("weapons/lg_ammoswitched")
-			SHTG A 1 A_PlaySound("weapons/lg_autoselected")
+			LAWG A 10 A_PlaySound("weapons/lg_ammoswitched")
+			LAWG A 1 A_PlaySound("weapons/lg_autoselected")
 			Goto Ready
-		*/
+		*/	
+		FireAP: // Needs to... punch through enemies?
+			LAWG A 0 A_GunFlash
+			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
+			TNT1 A 0 A_FireBullets(1,1,1,40,"BulletPuff",FBF_USEAMMO)
+			LAWG A 2
+			LAWG BC 3
+			LAWG AAAAAA 1 A_ReFire 
+			Goto Ready	
+		FireHEAT: // Needs to be Seeker round
+			LAWG A 0 A_GunFlash
+			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
+			TNT1 A 0 A_FireBullets(1,1,1,40,"BulletPuff",FBF_USEAMMO)
+			LAWG A 2
+			LAWG BC 5
+			LAWG AAAAAA 1 A_ReFire 
+			Goto Ready	
+		FireHIEX: // Fast rocket, essentially
+			LAWG A 0 A_GunFlash
+			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
+			TNT1 A 0 A_FireBullets(1,1,1,200,"BulletPuff",FBF_USEAMMO)
+			LAWG A 2
+			LAWG BC 5
+			LAWG AAAAAA 1 A_ReFire 
+			Goto Ready	
+		FireINC: // Fast rocket with BURNING, ahahaha
+			LAWG A 0 A_GunFlash
+			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
+			TNT1 A 0 A_FireBullets(1,1,1,40,"BulletPuff",FBF_USEAMMO)
+			LAWG A 2
+			LAWG BC 5
+			LAWG AAAAAA 1 A_ReFire 
+			Goto Ready	
+		FireRICO: // pwing pwang pwong AAAGH
+			LAWG A 0 A_GunFlash
+			TNT1 A 0 {
+				A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON);
+				A_FireProjectile("LawgiverRICOShot", 1, true);
+			}
+			LAWG A 2
+			LAWG BC 3
+			LAWG AAAAAA 1 A_ReFire 
+			Goto Ready
+		FireSTD: //needs to be here, not at the beginning, as a fallthrough safety
+			LAWG A 0 A_GunFlash
+			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
+			TNT1 A 0 A_FireBullets(1,1,1,40)
+			LAWG A 2
+			LAWG BC 3
+			LAWG AAAAAA 1 A_ReFire 
+			Goto Ready
+		NoAmmo:
+			TNT1 A 0 {
+				A_StopSound(CHAN_WEAPON);
+				//A_SetInventory("LawgiverFireMode", 0);
+			}
+			LAWG A 10 A_PlaySound("weapons/lg_outofammo")
+			Goto Ready
+		Flash:
+			SHGF A 4 BRIGHT A_Light2
+			TNT1 A 1 A_Light0
+			Goto LightDone	
 	}
 }
 
 ACTOR LawgiverSTDShot {
 	Obituary "%k rendered their verdict on %o's crimes in 10mm FMJ."
-	Decal DoomImpScorch
+	Decal BulletChip
 }
 
 ACTOR LawgiverAPShot {
@@ -122,8 +192,8 @@ ACTOR LawgiverINCShot {
 ACTOR LawgiverRICOShot {
 	Obituary "%o was surprised to find out %k's Lawgiver was set on Ricochet."
 	Decal BulletChip
-	Radius 1
-	Speed 150
+	Radius 5
+	Speed 100
 	Damage 10
 	Gravity 1
 	BounceFactor 0.99
@@ -133,7 +203,7 @@ ACTOR LawgiverRICOShot {
 	Projectile
 	Alpha 0.9
 	BounceType Hexen
-	//DeathSound "weapons/lpst_impact"
+	DeathSound "weapons/lpst_impact"
 	//BounceSound  // for bounce
 	States {
 		Spawn:
@@ -149,7 +219,6 @@ ACTOR LawgiverAUTOShot {
 	Obituary "%o had Justice served at 2500 RPM, courtesy of %k's Lawgiver."
 	Decal BulletChip
 }
-
 
 ACTOR LawgiverFireMode : Inventory {
    Inventory.MaxAmount 6 //autofire not implemented

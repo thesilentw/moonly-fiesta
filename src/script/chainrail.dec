@@ -21,7 +21,7 @@ ACTOR Chainrail : Weapon {
 			Loop
 		Fire:
 			CHRL A 0 A_GunFlash
-			TNT1 A 0 A_RailAttack(100, 0, 1, "darkorchid", "aquamarine1", RGF_FULLBRIGHT, 0, "none", 0, 0, 0, 20, 1, 2, null, 5, 180, 2)
+			TNT1 A 0 A_RailAttack(100, 0, 1, "darkorchid", "aquamarine1", RGF_FULLBRIGHT, 0, "none", 0, 0, 0, 20, 1, 2, "none", 5, 180, 2)
 			// recoil anims
 			CHRL A 3 Offset(0,44)
 			CHRL A 3 Offset(0,40)
