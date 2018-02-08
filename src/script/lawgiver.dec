@@ -1,40 +1,83 @@
 ACTOR Lawgiver : Weapon {
 	inventory.pickupMessage "Well, look at that. I must be a Judge."
-	weapon.ammoType "clip"
+	Weapon.AmmoType1 "LawgiverMag"
+	Weapon.AmmoUse1 0
+	Weapon.AmmoGive1 0
+	Weapon.AmmoType2 "clip"
+	Weapon.AmmoUse2 0
+	Weapon.AmmoGive2 20
 	weapon.slotNumber "2"
-	weapon.ammogive "10"
 	weapon.upsound "weapons/lg_deploy"
-	weapon.ammouse "1"
 	+weapon.Ammo_Optional
+	+Weapon.Ammo_CheckBoth
+	
+	/* --DESIGN--	
+	LawgiverMag - 14 shots
+	LawgiverFireMode 0 - Standard - 1 bullet per shot
+	LawgiverFireMode 1 - Armor Piercing - 2 bullets per shot, pierces enemies
+	LawgiverFireMode 2 - Heatseeker - 3 bullets per shot, tracks enemies
+	LawgiverFireMode 3 - High Ex - 7 bullets per shot - minirocket
+	LawgiverFireMode 4 - Incendiary - 4 bullets per shot - minirocket with flame
+	LawgiverFireMode 5 - Ricochet - 1 bullet per shot - bounces
+	LawgiverFireMode 6 - Auotfire/burst *NOT IMPLEMENTED* - 3-round burst, ammo discount.
+	*/
 	
 	states {
 		Spawn:
 			LAWP A -1
 			Stop
 		Ready:
-			LAWG A 1 A_WeaponReady
+			LAWG A 1 A_WeaponReady(WRF_ALLOWRELOAD)
 			Loop
 		Select:
 			LAWG A 1 A_Raise
 			Loop
 		Deselect:
 			LAWG A 1 A_Lower
-			Loop
+			Loop			
 		Fire:
-			TNT1 A 0 A_JumpIfNoAmmo("NoAmmo")
+			TNT1 A 0 {
+				if (countInv("LawgiverMag") < 1) {
+					if (countInv("clip") < 1) {
+						return state("NoAmmo");
+					} else {
+						return state("DryReload");
+					}
+				} else {return state ("");}
+			}
 			TNT1 A 0 {
 				if (countInv("LawgiverFireMode") == 0) {
-					return state("FireSTD");
+					return state("FireSTD"); // we already checked if we have at least 1 shot
 				} else if (countInv("LawgiverFireMode") == 1) {
-					return state("FireAP");
+					if (countInv("LawgiverMag") >= 2) {
+						return state("FireAP");
+					} else {
+						return state("Reload");
+					}
 				} else if (countInv("LawgiverFireMode") == 2) {
-					return state("FireHEAT");
+					if (countInv("LawgiverMag") >= 3) {
+						return state("FireHEAT");
+					} else {
+						return state("Reload");
+					}
 				} else if (countInv("LawgiverFireMode") == 3) {
-					return state("FireHIEX");
+					if (countInv("LawgiverMag") >= 7) {
+						return state("FireHIEX");
+					} else {
+						return state("Reload");
+					}
 				} else if (countInv("LawgiverFireMode") == 4) {
-					return state("FireINC");
+					if (countInv("LawgiverMag") >= 4) {
+						return state("FireINC");
+					} else {
+						return state("Reload");
+					}
 				} else if (countInv("LawgiverFireMode") == 5) {
-					return state("FireRICO");
+					if (countInv("LawgiverMag") >= 1) {
+						return state("FireRICO");
+					} else {
+						return state("Reload");
+					}
 				} else {
 					return state("NoAmmo");
 				}
@@ -100,42 +143,56 @@ ACTOR Lawgiver : Weapon {
 			LAWG A 1 A_PlaySound("weapons/lg_autoselected")
 			Goto Ready
 		*/	
-		FireAP: // Needs to... punch through enemies?
-			LAWG A 0 A_GunFlash
-			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
-			TNT1 A 0 A_FireBullets(1,1,1,40,"BulletPuff",FBF_USEAMMO)
+		FireAP: // Now with punchthrough
+			TNT1 A 0 {
+				A_GunFlash;
+				A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON);
+				A_TakeInventory("LawgiverMag", 2);// 7 shots per mag
+				//A_FireBullets(frandom(-0.1,0.1), frandom(-0.1,0.1), 3, 20, "BulletPuff", FBF_ExplicitAngle|FBF_NoRandom|FBF_UseAmmo);
+				A_RailAttack(60, 0, true, "none", "none", RGF_SILENT, 0, "APBulletPuff", frandom(-0.1,0.1), frandom(-0.1,0.1), 0, 0, 0, 0, "null", 0, 0, 6);
+			}
 			LAWG A 2
 			LAWG BC 3
 			LAWG AAAAAA 1 A_ReFire 
 			Goto Ready	
 		FireHEAT: // Needs to be Seeker round
-			LAWG A 0 A_GunFlash
-			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
-			TNT1 A 0 A_FireBullets(1,1,1,40,"BulletPuff",FBF_USEAMMO)
+			TNT1 A 0 {
+				A_GunFlash;
+				A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON);
+				A_TakeInventory("LawgiverMag", 3); // 4 shots per mag
+				A_FireBullets(1,1,1,40,"BulletPuff",FBF_USEAMMO);
+			}
 			LAWG A 2
 			LAWG BC 5
 			LAWG AAAAAA 1 A_ReFire 
 			Goto Ready	
 		FireHIEX: // Fast rocket, essentially
-			LAWG A 0 A_GunFlash
-			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
-			TNT1 A 0 A_FireBullets(1,1,1,200,"BulletPuff",FBF_USEAMMO)
+			TNT1 A 0 {
+				A_GunFlash;
+				A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON);
+				A_TakeInventory("LawgiverMag", 7); // 2 shots per mag
+				A_FireBullets(1,1,1,200,"BulletPuff",FBF_USEAMMO);
+			}
 			LAWG A 2
 			LAWG BC 5
 			LAWG AAAAAA 1 A_ReFire 
 			Goto Ready	
 		FireINC: // Fast rocket with BURNING, ahahaha
-			LAWG A 0 A_GunFlash
-			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
-			TNT1 A 0 A_FireBullets(1,1,1,40,"BulletPuff",FBF_USEAMMO)
+			TNT1 A 0 {
+				A_GunFlash;
+				A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON);
+				A_TakeInventory("LawgiverMag", 4); // 3 shots per mag
+				A_FireBullets(1,1,1,200,"BulletPuff",FBF_USEAMMO);
+			}
 			LAWG A 2
 			LAWG BC 5
 			LAWG AAAAAA 1 A_ReFire 
 			Goto Ready	
 		FireRICO: // pwing pwang pwong AAAGH
-			LAWG A 0 A_GunFlash
 			TNT1 A 0 {
+				A_GunFlash;
 				A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON);
+				A_TakeInventory("LawgiverMag", 1); // 14 shots per mag
 				A_FireProjectile("LawgiverRICOShot", 1, true);
 			}
 			LAWG A 2
@@ -143,9 +200,12 @@ ACTOR Lawgiver : Weapon {
 			LAWG AAAAAA 1 A_ReFire 
 			Goto Ready
 		FireSTD: //needs to be here, not at the beginning, as a fallthrough safety
-			LAWG A 0 A_GunFlash
-			TNT1 A 0 A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON)
-			TNT1 A 0 A_FireBullets(1,1,1,40)
+			TNT1 A 0 {
+				A_GunFlash;
+				A_PlaySound("weapons/lg_firesingle", CHAN_WEAPON);
+				A_TakeInventory("LawgiverMag", 1); // 14 shots per mag
+				A_FireBullets(1,1,1,40);
+			}
 			LAWG A 2
 			LAWG BC 3
 			LAWG AAAAAA 1 A_ReFire 
@@ -158,12 +218,60 @@ ACTOR Lawgiver : Weapon {
 			LAWG A 10 A_PlaySound("weapons/lg_outofammo")
 			Goto Ready
 		Flash:
-			SHGF A 4 BRIGHT A_Light2
+			TNT1 A 4 BRIGHT A_Light2
 			TNT1 A 1 A_Light0
-			Goto LightDone	
+			Goto LightDone
+		Reload:
+			TNT1 A 0 {
+				if (countInv("LawgiverMag") == 14) { // if mag's full...
+					if (countInv("clip") < 1) { // ..and we have no reserve, tell us!
+						return state("NoAmmo");
+					} else {
+						return state("Ready"); // otherwise ignore the reload.
+					}
+				} else {return state ("");}
+			}
+			LAWG R 1 A_PlaySound("weapons/shotgr", CHAN_WEAPON)
+			LAWG R 1 Offset(0,38)
+			LAWG R 1 Offset(0,44)
+			LAWG R 1 Offset(0,52)
+			LAWG R 1 Offset(0,62)
+			LAWG R 1 Offset(0,72)
+			LAWG R 1 Offset(0,82)
+			TNT1 A 0 A_GiveInventory("LawgiverMag", 14)
+			TNT1 A 8 A_TakeInventory("clip", 1) // 1 clip is 1 magazine. lol
+			LAWG R 1 Offset(0,82)
+			LAWG R 1 Offset(0,72)
+			LAWG R 1 Offset(0,62)
+			LAWG R 1 Offset(0,52)
+			LAWG R 1 Offset(0,44)
+			LAWG R 1 Offset(0,38)
+			LAWG R 1 Offset(0,35)
+			LAWG R 1 Offset(0,32)
+			Goto Ready
+		DryReload: //not implemented
+			Goto Reload
 	}
 }
 
+ACTOR LawgiverMag : Ammo {
+	Inventory.MaxAmount 14
+	+IGNORESKILL
+}
+
+ACTOR LawgiverFireMode : Inventory {
+	Inventory.MaxAmount 6 //autofire not implemented
+	// 0 - Standard
+	// 1 - Armor Piercing
+	// 2 - Heatseeker
+	// 3 - High Ex
+	// 4 - Incendiary
+	// 5 - Ricochet		 
+	// 6 - Auotfire/burst *NOT IMPLEMENTED*
+	+IGNORESKILL
+}
+
+/*
 ACTOR LawgiverSTDShot {
 	Obituary "%k rendered their verdict on %o's crimes in 10mm FMJ."
 	Decal BulletChip
@@ -173,18 +281,18 @@ ACTOR LawgiverAPShot {
 	Obituary "%o needs to pick better cover if he's up against %k's Armor Piercing rounds."
 	Decal BulletChip
 }
-
-ACTOR LawgiverHEATShot {
+*/
+ACTOR LawgiverHEATShot : FastProjectile {
 	Obituary "%o discovered that there's no escape from %k's Heatseeker rounds."
 	Decal BulletChip
 }
 
-ACTOR LawgiverHIEXShot {
+ACTOR LawgiverHIEXShot : FastProjectile {
 	Obituary "%k's going to be picking pieces of %o out of his teeth after connecting with that High-Ex round."
 	Decal DoomImpScorch
 }
 
-ACTOR LawgiverINCShot {
+ACTOR LawgiverINCShot : FastProjectile {
 	Obituary "%o felt the burning sensation of a Hotshot round from %k's Lawgiver."
 	Decal DoomImpScorch
 }
@@ -220,14 +328,7 @@ ACTOR LawgiverAUTOShot {
 	Decal BulletChip
 }
 
-ACTOR LawgiverFireMode : Inventory {
-   Inventory.MaxAmount 6 //autofire not implemented
-   // 0 - Standard
-   // 1 - Armor Piercing
-   // 2 - Heatseeker
-   // 3 - High Ex
-   // 4 - Incendiary
-   // 5 - Ricochet		 
-   // 6 - Auotfire/burst *NOT IMPLEMENTED*
-   
+ACTOR APBulletPuff : BulletPuff {
+	+ALWAYSPUFF
 }
+//eof
