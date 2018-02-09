@@ -22,7 +22,7 @@ ACTOR Lawgiver : Weapon {
 	LawgiverFireMode 6 - Auotfire/burst *NOT IMPLEMENTED* - 3-round burst, ammo discount.
 	*/
 	
-	states {
+	States {
 		Spawn:
 			LAWP A -1
 			Stop
@@ -51,35 +51,45 @@ ACTOR Lawgiver : Weapon {
 				} else if (countInv("LawgiverFireMode") == 1) {
 					if (countInv("LawgiverMag") >= 2) {
 						return state("FireAP");
+					} else if ((countInv("LawgiverMag") + countInv("clip")) < 2) {
+						return state("NoAmmo");
 					} else {
 						return state("Reload");
 					}
 				} else if (countInv("LawgiverFireMode") == 2) {
 					if (countInv("LawgiverMag") >= 3) {
 						return state("FireHEAT");
+					} else if ((countInv("LawgiverMag") + countInv("clip")) < 3) {
+						return state("NoAmmo");
 					} else {
 						return state("Reload");
 					}
 				} else if (countInv("LawgiverFireMode") == 3) {
 					if (countInv("LawgiverMag") >= 7) {
 						return state("FireHIEX");
+					} else if ((countInv("LawgiverMag") + countInv("clip")) < 7) {
+						return state("NoAmmo");
 					} else {
 						return state("Reload");
 					}
 				} else if (countInv("LawgiverFireMode") == 4) {
 					if (countInv("LawgiverMag") >= 4) {
 						return state("FireINC");
+					} else if ((countInv("LawgiverMag") + countInv("clip")) < 4) {
+						return state("NoAmmo");
 					} else {
 						return state("Reload");
 					}
 				} else if (countInv("LawgiverFireMode") == 5) {
 					if (countInv("LawgiverMag") >= 1) {
 						return state("FireRICO");
+					} else if ((countInv("LawgiverMag") + countInv("clip")) < 1) {
+						return state("NoAmmo");
 					} else {
 						return state("Reload");
 					}
 				} else {
-					return state("NoAmmo");
+					return state("NoAmmo"); //this SHOULD never call unless the firemode goes haywire
 				}
 			}
 		AltFire:
@@ -229,17 +239,22 @@ ACTOR Lawgiver : Weapon {
 					} else {
 						return state("Ready"); // otherwise ignore the reload.
 					}
-				} else {return state ("");}
-			}
-			LAWG R 1 A_PlaySound("weapons/shotgr", CHAN_WEAPON)
+				} else {return state ("DoReload");}
+			}		
+		DoReload:
 			LAWG R 1 Offset(0,38)
 			LAWG R 1 Offset(0,44)
 			LAWG R 1 Offset(0,52)
 			LAWG R 1 Offset(0,62)
 			LAWG R 1 Offset(0,72)
 			LAWG R 1 Offset(0,82)
-			TNT1 A 0 A_GiveInventory("LawgiverMag", 14)
-			TNT1 A 8 A_TakeInventory("clip", 1) // 1 clip is 1 magazine. lol
+			LAWG R 1 A_PlaySound("weapons/shotgr", CHAN_WEAPON) //placeholder reload sound
+			TNT1 A 0 {
+				while ((countInv("LawgiverMag") < 14) && (countInv("clip") > 0)) {
+					A_GiveInventory("LawgiverMag", 1);
+					A_TakeInventory("clip", 1);
+				}
+			}
 			LAWG R 1 Offset(0,82)
 			LAWG R 1 Offset(0,72)
 			LAWG R 1 Offset(0,62)
