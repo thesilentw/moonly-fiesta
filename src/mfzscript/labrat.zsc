@@ -1,0 +1,38 @@
+Class Labrat : DoomPlayer {
+	/*
+	player vars
+	*/
+	int dmgPostArmor;
+	int lr_toxicity;
+	
+	/*
+	DRUG VARS - purple, red, blue, yellow, orange, green, and white
+	*/	
+	int dt_red; //damage threshold given when using RED
+	
+	default {}
+	
+	/*
+	setup fxns
+	*/
+	override void PostBeginPlay() {
+		lr_toxicity = 0;
+		dt_red = 3;
+		super.PostBeginPlay();
+	}
+	
+	/*
+	Gameplay fxns
+	*/
+	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags = 0, double angle = 0) {
+		int newdamage;
+		int damagePostArmor = Super.DamageMobj(inflictor, source, damage, mod, flags, angle); // Get the damage amount from the real DamageMobj function
+		console.printf("%d damage after armor reduction", damagePostArmor);
+		int save = dt_red;
+		if (damagePostArmor - save < 1) newdamage = 1;
+		else newdamage = damagePostArmor - save;
+		Console.printf("DT save: %i (%i -> %i)", save, damagePostArmor, newdamage);
+		return newdamage; // Return the damage amount, as expected
+   }
+
+}

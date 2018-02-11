@@ -1,0 +1,12 @@
+// injector class for DRUGSMOD
+
+Class Injector : DoomWeapon {
+	//default {
+	//
+	//}
+	//States: {
+	//
+	//}
+
+}
+//eof

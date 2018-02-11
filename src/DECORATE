@@ -1,7 +1,7 @@
-#include "script/laspistol.dec"
-#include "script/chainrail.dec"
-#include "script/gowshotgun.dec"
-#include "script/beedoken.dec"
-#include "script/spinrifle.dec"
-#include "script/lawgiver.dec"
+#include "mfdecorate/laspistol.dec"
+#include "mfdecorate/chainrail.dec"
+#include "mfdecorate/gowshotgun.dec"
+#include "mfdecorate/beedoken.dec"
+#include "mfdecorate/spinrifle.dec"
+#include "mfdecorate/lawgiver.dec"
 //EOF
