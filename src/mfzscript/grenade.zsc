@@ -1,0 +1,133 @@
+Class GrenFrag : Weapon {
+
+	default {
+		Radius 20;
+		Height 16;
+		Weapon.SelectionOrder 2500;
+		+WEAPON.NOAUTOFIRE
+		+WEAPON.NOAUTOAIM
+		Weapon.AmmoUse 1;
+		Weapon.AmmoGive 2;
+		Weapon.AmmoType "RocketAmmo";
+		Weapon.Kickback 100;
+		Weapon.SlotNumber 5;
+		Inventory.PickupMessage "Grabbed some Grenades.";	
+	}
+
+	States {
+		Spawn:
+			LAUN A -1;
+			Stop;
+		Ready:
+			MISG A 1 A_WeaponReady();
+			Loop;
+		Deselect:
+			MISG A 1 A_Lower();
+			Loop;
+		Select: 
+			MISG A 1 A_Raise();
+			Loop;
+		Fire: 
+			MISG B 8 A_GunFlash();
+			MISG B 12 A_FireProjectile("GrenFragThrown",0,1,0,0,0,-1);
+			MISG B 0 A_ReFire();
+			Goto Ready;
+		Flash: 
+			MISF A 3 bright A_Light1();
+			MISF B 4 bright;
+			MISF C 4 bright A_Light2();
+			MISF D 4 bright A_Light2();
+			Goto LightDone;
+	}	
+}
+
+
+Class GrenFragThrown : Grenade {
+	
+	bool logDeath, logGrenade, logDetonate, logMushroom;
+
+	override void PostBeginPlay() {
+		logDeath = logGrenade = logDetonate = logMushroom = true;
+		super.PostBeginPlay();
+	}
+	
+	default {
+		Radius 4;
+        Height 4;
+        Speed 55;
+        Scale 0.35;
+        DamageFunction (random(20,30));
+        BounceType "Doom";
+        //BounceSound "grenade/bounce";
+        BounceFactor 0.35;
+        WallBounceFactor 0.75;
+        Gravity 0.15;
+        ReactionTime 85;
+        Species "Grenade";
+        DamageType "Explosive";
+        Projectile;
+        +THRUGHOST
+        +THRUSPECIES
+        +BOUNCEONWALLS
+        +BOUNCEONFLOORS
+        +BOUNCEONCEILINGS
+        +ALLOWBOUNCEONACTORS
+        -NOGRAVITY
+        +DONTGIB
+        +MOVEWITHSECTOR
+        +EXTREMEDEATH
+        +ROLLCENTER
+        +ROLLSPRITE
+        +USEBOUNCESTATE
+        +CANBOUNCEWATER
+        +DONTBLAST
+        +DONTTHRUST
+		Obituary "Once you've pulled the pin on Mr. Grenade, he is no longer your friend, %o.";
+	}
+	
+	States {
+		Spawn:
+			SGRN A 1 Bright;
+			Loop;
+		Death:
+			MISL B 8 Bright {
+				if (logDeath) {
+					logDeath = false;
+					Console.printf("projectile went to death state");
+				}
+				A_Explode();
+			}
+			MISL C 6 Bright;
+			MISL D 4 Bright;
+			Stop;
+ 		Grenade:
+			MISL A 100 { 
+				if (logGrenade) {
+					logGrenade = false;
+					Console.printf("projectile went to grenade state");
+				}
+				resolveState("Death");
+			}
+			Wait;
+		Detonate:
+			MISL B 4 {
+				if (logDetonate) {
+					logDetonate = false;
+					Console.printf("projectile went to detonate state");
+				}
+				A_Scream();
+			}
+			MISL C 6 A_Detonate();
+			MISL D 10;
+			Stop;
+		Mushroom:
+			MISL B 8 {
+				if (logMushroom) {
+					logMushroom = false;
+					Console.printf("projectile went to mushroom state");
+				}
+				A_Mushroom();
+			}
+			Goto Death+1;
+	}
+}

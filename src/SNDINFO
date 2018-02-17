@@ -36,4 +36,6 @@ weapons/lg_ammoswitched lgassw
 weapons/lg_deploy lgdply
 weapons/lg_outofammo lgout
 $volume weapons/lg_outofammo 0.8
+//labrat stuff
+weapons/labpistol_fire LBPSTF
 // eof

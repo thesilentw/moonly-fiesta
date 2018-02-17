@@ -1,0 +1,6 @@
+#include "zcommon.acs"
+
+script "lookascript" (void) {
+    Log(s:"this is a log!");
+	print(s:"Hello World! this is a print!");
+}

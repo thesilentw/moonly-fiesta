@@ -1,38 +1,100 @@
 Class Labrat : DoomPlayer {
-	/*
-	player vars
-	*/
-	int dmgPostArmor;
-	int lr_toxicity;
+	int labrat_tox_level;
+	int labrat_tox_crippled;
+	int labrat_tox_dead;
 	
-	/*
-	DRUG VARS - purple, red, blue, yellow, orange, green, and white
-	*/	
+	bool logFirstShaderInvocation;
+		
+	PlayerInfo player;
+		
+	//
+	//DRUG VARS - purple, red, blue, yellow, orange, green, and white
+	//	
 	int dt_red; //damage threshold given when using RED
 	
-	default {}
 	
-	/*
-	setup fxns
-	*/
-	override void PostBeginPlay() {
-		lr_toxicity = 0;
-		dt_red = 3;
-		super.PostBeginPlay();
+	// Props
+	default {
+		Player.StartItem "Injector";
+		Player.StartItem "LabPistol";
+		Player.StartItem "Clip", 50;
+		Player.DisplayName "Labrat";
+		Player.ForwardMove 0.75, 0.75;
+		Player.RunHealth 15;
+		Player.SideMove 0.75, 0.75;
+		Player.ViewBob 0.5;
+		Player.MaxHealth 125;
 	}
 	
-	/*
-	Gameplay fxns
-	*/
+	//
+	//setup fxns
+	//
+	override void PostBeginPlay() {
+		super.PostBeginPlay();
+		player = players[consoleplayer];
+		labrat_tox_level = 0;
+		labrat_tox_dead = 1000;
+		labrat_tox_crippled = int(labrat_tox_dead * 0.8);
+		
+		dt_red = 3;
+		logFirstShaderInvocation = false;
+	}	
+	
+	//
+	//Gameplay fxns
+	//
 	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags = 0, double angle = 0) {
 		int newdamage;
 		int damagePostArmor = Super.DamageMobj(inflictor, source, damage, mod, flags, angle); // Get the damage amount from the real DamageMobj function
-		console.printf("%d damage after armor reduction", damagePostArmor);
-		int save = dt_red;
-		if (damagePostArmor - save < 1) newdamage = 1;
-		else newdamage = damagePostArmor - save;
-		Console.printf("DT save: %i (%i -> %i)", save, damagePostArmor, newdamage);
-		return newdamage; // Return the damage amount, as expected
-   }
-
+		//console.printf("%d damage after armor reduction", damagePostArmor);
+		if (dt_red) {
+			int save = dt_red;
+			if (damagePostArmor - save < 1) newdamage = 1;
+			else newdamage = damagePostArmor - save;
+			Console.printf("DT save: %i (%i -> %i)", save, damagePostArmor, newdamage);
+			return newdamage; // Return the damage amount, as expected
+		} else return damagePostArmor;
+    }
+	
+	override void Tick() {
+		super.Tick();
+		
+		/* PSEUDOCODE
+		checkaddiction()
+		
+		checktoxlevel()
+		
+		checktimers()
+			
+		
+		
+		END PSEUDOCODE */
+		
+		if (player && logFirstShaderInvocation) {
+			Console.printf("beginning first invocation log");
+			logFirstShaderInvocation = false;
+			float t = level.totaltime / 35.; 
+			Console.printf("logging current time as %f", t);
+			Shader.SetUniform1f(player, "Redout", "mf_time", t);
+			Console.printf("set timer in shader");
+			Shader.SetEnabled(player, "Redout", true);
+			Console.printf("shader enabled");
+		} else
+		if (player) {
+			if (labrat_tox_level > labrat_tox_dead) {
+				// player gotta die, oops
+			} if (labrat_tox_level > labrat_tox_crippled) {
+				Shader.SetUniform1f(player, "Redout", "mf_time", (level.totaltime / 35.0));
+				Shader.SetEnabled(player, "Redout", true);
+				//do crippled movement and shit
+			}
+		}
+		if (player) Shader.SetEnabled(player, "redout", true);
+	}
 }
+
+
+// weapon includes
+#include "mfzscript/labpistol.zsc"
+#include "mfzscript/injector.zsc"
+//eof

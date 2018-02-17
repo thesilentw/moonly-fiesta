@@ -39,7 +39,7 @@ del *.o
 del error.txt
 
 REM Now let's go to the source directory
-cd ../acs_src
+cd ../mfacs
 del *.o
 del error.txt
 
@@ -57,15 +57,6 @@ goto acsnoerror
 
 echo ACS compiled successfully.
 
-REM Go to the ACS directory to do some cleaning up
-cd ../acs
-
-REM These objects aren't necessary
-del zcommon.o
-del zdefs.o
-del zspecial.o
-del zwvars.o
-
 REM Generate the LOADACS
 type NUL > ../loadacs.txt
 echo // Generated automatically by build script at %TIME% on %DATE%, do not edit>>../loadacs.txt
@@ -82,39 +73,5 @@ error.txt
 exit
 
 :acsend
-
-REM Proceed to compile map scripts
-cd ..\maps
-del *.o
-del error.txt
-
-for %%v in (*.acs) do (
-acc "%%v"
-if exist acs.err ren acs.err error.txt
-if exist error.txt goto mapscripterror
-)
-
-goto mapscriptnoerror
-
-:mapscriptnoerror
-
-echo Map scripts compiled successfully.
-goto mapscriptend
-
-:mapscripterror
-
-echo Errors found in compiling map scripts. Aborting...
-error.txt
-exit
-
-:mapscriptend
-
-REM Use FBInserter to insert compiled objects into their respective WADs
-for %%a in (*.wad) do fbinserter -nopause "%%a" "%%~na.o" MAP
-
-REM Clean up any leftover junk
-if exist *.bak del *.bak
-if exist *.backup* del *.backup*
-if exist *.o del *.o
 
 :compileend

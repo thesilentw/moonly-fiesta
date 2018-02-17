@@ -1,12 +1,65 @@
 // injector class for DRUGSMOD
 
 Class Injector : DoomWeapon {
-	//default {
-	//
-	//}
-	//States: {
-	//
-	//}
+	
+	int drugNum, drugMax;
+	
+	property SelectedDrug: drugNum;
+	property SelectedDrugMax: drugMax;
+	
+	
+	default {
+		Injector.SelectedDrug 0;
+		Injector.SelectedDrugMax 5;
+		+weapon.noautofire
+		+weapon.ammo_optional
+		Weapon.SlotNumber 1;
+		Inventory.PickupMessage "You shouldn't ever see this, since you start with one.";
+	}
+	
+	States {
+		Spawn:
+			TLGL A -1;
+			Stop;
+		Ready:
+			INJC A 1 A_WeaponReady();
+			Loop;
+		Deselect:
+			INJC A 1 A_Lower();
+			Loop;
+		Select: 
+			INJC A 1 A_Raise();
+			Loop;
+		Fire:
+			TNT1 A 0 {
+				if (!invoker.drugNum) {
+					invoker.drugNum = 0;
+				}
+			}
+			INJC ABCDEF 5;
+			INJC G 3 {
+				A_Pain();
+				invoker.A_StartDrugs(invoker.drugNum);
+			}
+			INJC HI 8;
+			Goto Ready;
+		AltFire:
+			INJC A 10 {
+				invoker.drugNum++;
+				if (invoker.drugNum > invoker.drugMax) invoker.drugNum = 0;
+				String logstring = String.Format("Drug mode changed to %i", invoker.drugNum);
+				A_PrintBold(logstring);
+				Console.printf(logstring);
+			}
+			Goto Ready;
+	}
+	
+	void A_StartDrugs(int passedDrug) {
+		String logstring = String.Format("Drug %i injected, whoo, feel the hit.", passedDrug);
+		A_PrintBold(logstring);
+		Console.printf(logstring);
+	}
+
 
 }
 //eof

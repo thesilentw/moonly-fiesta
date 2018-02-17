@@ -1,0 +1,19 @@
+//HardwareShader PostProcess scene
+//{
+//	Name "SS_BZK_OD"
+//	Shader "mfshaders/berserk_od.glsl" 330
+//	//Speed 1.0
+//}
+
+hardwareshader postprocess beforebloom {
+	name "eyepatch"
+	shader "mfshaders/eyepatch.fp" 330
+}
+
+HardwareShader PostProcess scene {
+	Name "Redout"
+	Shader "mfshaders/redout.fp" 330
+	Uniform float mf_time
+	//enabled
+	//Speed 1.0
+}

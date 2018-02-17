@@ -1,4 +1,6 @@
 #include "mfzscript/superrev.zsc"
-#include "mfzscript/injector.zsc"
+#include "mfzscript/grenade.zsc"
+
 #include "mfzscript/labrat.zsc"
+
 //eof
