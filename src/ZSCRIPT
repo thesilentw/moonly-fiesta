@@ -1,6 +1,11 @@
+// enemies
 #include "mfzscript/superrev.zsc"
-#include "mfzscript/grenade.zsc"
 
+//weapons
+#include "mfzscript/grenade.zsc"
+#include "mfzscript/lawgiver.zsc"
+
+//player
 #include "mfzscript/labrat.zsc"
 
 //eof

@@ -14,6 +14,10 @@ HardwareShader PostProcess scene {
 	Name "Redout"
 	Shader "mfshaders/redout.fp" 330
 	Uniform float mf_time
-	//enabled
-	//Speed 1.0
+}
+
+HardwareShader PostProcess scene {
+	Name "TearGas"
+	Shader "mfshaders/teargas.fp" 330
+	Uniform float mf_time
 }

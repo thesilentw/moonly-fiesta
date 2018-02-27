@@ -1,4 +1,15 @@
 // injector class for DRUGSMOD
+//
+//	DRUGS
+//	0 - Red - Damage Resistance
+//	1 - Orange - Faster run and higher jump
+//	2 - Yellow - Slow time
+//	3 - Green - Health Regen
+//	4 - Blue - Vision Mode (nightvision)
+//	5 - White - Detox
+//
+//
+//
 
 Class Injector : DoomWeapon {
 	
@@ -39,7 +50,7 @@ Class Injector : DoomWeapon {
 			INJC ABCDEF 5;
 			INJC G 3 {
 				A_Pain();
-				invoker.A_StartDrugs(invoker.drugNum);
+				invoker.A_StartDrugs(invoker.drugNum, invoker.owner);
 			}
 			INJC HI 8;
 			Goto Ready;
@@ -54,11 +65,22 @@ Class Injector : DoomWeapon {
 			Goto Ready;
 	}
 	
-	void A_StartDrugs(int passedDrug) {
-		String logstring = String.Format("Drug %i injected, whoo, feel the hit.", passedDrug);
-		A_PrintBold(logstring);
-		Console.printf(logstring);
-	}
+	void A_StartDrugs(int passedDrug, Actor passedPlayer) {
+		//let drugTarget = Labrat(passedPlayer);
+		//if (drugTarget) {
+			switch (passedDrug) {
+				case 0:
+					Labrat(owner).damageResist += 3;
+					Console.printf(String.format("RED injected, damageResist now at %i", Labrat(owner).damageResist));
+					break;
+				default:	
+					String logstring = String.Format("Drug %i injected, whoo, feel the hit.", passedDrug);
+					A_PrintBold(logstring);
+					Console.printf(logstring);
+					break;
+			}
+		}
+	//}
 
 
 }

@@ -3,5 +3,5 @@
 #include "mfdecorate/gowshotgun.dec"
 #include "mfdecorate/beedoken.dec"
 #include "mfdecorate/spinrifle.dec"
-#include "mfdecorate/lawgiver.dec"
+//#include "mfdecorate/lawgiver.dec"
 //EOF
