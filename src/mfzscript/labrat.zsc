@@ -32,12 +32,10 @@ Class Labrat : DoomPlayer {
 		player = players[consoleplayer];
 		labrat_tox_level = 0;
 		labrat_tox_dead = 1000;
-		labrat_tox_crippled = int(labrat_tox_dead * 0.8);
+		labrat_tox_crippled = 50; //int(labrat_tox_dead * 0.8);
+		damageResist = 0;
 		
-		//damageResist = 0;
-		
-		
-		testRedoutShader = false;
+		testRedoutShader = true;
 		testGasShader = false;
 	}	
 	
@@ -66,6 +64,29 @@ Class Labrat : DoomPlayer {
 		}
     }
 	*/
+	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags = 0, double angle = 0) {
+		int originalDamage, reducedDamage, finalDamage;
+		originalDamage = damage;
+		
+		if (damageResist > 0) {
+			reducedDamage = originalDamage - damageResist;
+			
+			if (reducedDamage < 1) {
+				reducedDamage = 1;
+			}
+			
+			finalDamage = reducedDamage;
+			Console.printf("Resisted: %i (%i -> %i)", damageResist, originalDamage, reducedDamage);
+		}
+		
+		else {
+			finalDamage = damage;
+			Console.printf("No resist. %i (%i -> %i)", damageResist, originalDamage, reducedDamage);
+		}
+		
+		int actualDamage = super.DamageMobj(inflictor, source, finalDamage, mod, flags, angle);
+		return actualDamage;
+	}
 	
 	override void Tick() {
 		super.Tick();
@@ -82,12 +103,16 @@ Class Labrat : DoomPlayer {
 		END PSEUDOCODE */
 
 		if (player) {
-			if (labrat_tox_level > labrat_tox_dead) {
+			if (labrat_tox_level >= labrat_tox_dead) {
 				// player gotta die, oops
-			} if (labrat_tox_level > labrat_tox_crippled) {
+			}
+			if (labrat_tox_level >= labrat_tox_crippled) {
 				Shader.SetUniform1f(player, "Redout", "mf_time", (level.totaltime / 35.0));
 				Shader.SetEnabled(player, "Redout", true);
 				//do crippled movement and shit
+			}
+			else {
+				Shader.SetEnabled(player, "Redout", false);
 			}
 		}
 		

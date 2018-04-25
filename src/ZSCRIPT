@@ -1,5 +1,6 @@
 // enemies
 #include "mfzscript/superrev.zsc"
+#include "mfzscript/chaserbarrel.zsc"
 
 //weapons
 #include "mfzscript/grenade.zsc"

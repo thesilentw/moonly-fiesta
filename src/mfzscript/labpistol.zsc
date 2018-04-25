@@ -19,7 +19,7 @@ class Labpistol : DoomWeapon {
 			TPIS A 1 A_Raise();
 			Loop;
 		Fire:
-			TPIS A 2;
+			TPIS A 1;
 			TPIF A 3 { 
 				A_FireBullets(2,2,-1,20,"BulletPuff",FBF_USEAMMO | FBF_NORANDOM);
 				A_Light(5);

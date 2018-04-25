@@ -25,7 +25,7 @@ Class Injector : DoomWeapon {
 		+weapon.noautofire
 		+weapon.ammo_optional
 		Weapon.SlotNumber 1;
-		Inventory.PickupMessage "You shouldn't ever see this, since you start with one.";
+		Inventory.PickupMessage "ERROR: DEFIBRILLATING ICONOCLAST.";
 	}
 	
 	States {
@@ -47,7 +47,7 @@ Class Injector : DoomWeapon {
 					invoker.drugNum = 0;
 				}
 			}
-			INJC ABCDEF 5;
+			INJC ABCDEF 3;
 			INJC G 3 {
 				A_Pain();
 				invoker.A_StartDrugs(invoker.drugNum, invoker.owner);
@@ -66,22 +66,24 @@ Class Injector : DoomWeapon {
 	}
 	
 	void A_StartDrugs(int passedDrug, Actor passedPlayer) {
-		//let drugTarget = Labrat(passedPlayer);
-		//if (drugTarget) {
-			switch (passedDrug) {
-				case 0:
-					Labrat(owner).damageResist += 3;
-					Console.printf(String.format("RED injected, damageResist now at %i", Labrat(owner).damageResist));
-					break;
-				default:	
-					String logstring = String.Format("Drug %i injected, whoo, feel the hit.", passedDrug);
-					A_PrintBold(logstring);
-					Console.printf(logstring);
-					break;
-			}
+		switch (passedDrug) {
+			default:	
+				String logstring = String.Format("Undefined drug %i injected", passedDrug);
+				A_PrintBold(logstring);
+				Console.printf(logstring);
+				break;
+			case 0:
+				Labrat(passedPlayer).damageResist += 3;
+				Labrat(passedPlayer).labrat_tox_level += 10;
+				Console.printf(String.format("RED injected - Resist %i / Toxicity %i", Labrat(passedPlayer).damageResist, Labrat(passedPlayer).labrat_tox_level));
+				break;
+			case 5:
+				Labrat(passedPlayer).labrat_tox_level -= 20;
+				Labrat(passedPlayer).damageResist = 0;
+				Console.printf(String.format("WHITE injected - Effects removed, Toxicity %i", Labrat(passedPlayer).labrat_tox_level));
+				break;
 		}
-	//}
-
+	}
 
 }
 //eof
