@@ -1,7 +1,8 @@
-#include "mfdecorate/laspistol.dec"
-#include "mfdecorate/chainrail.dec"
+//#include "mfdecorate/laspistol.dec"
+//#include "mfdecorate/chainrail.dec"
 #include "mfdecorate/gowshotgun.dec"
 #include "mfdecorate/beedoken.dec"
-#include "mfdecorate/spinrifle.dec"
+//#include "mfdecorate/spinrifle.dec"
+#include "mfdecorate/bouncep.dec"
 //#include "mfdecorate/lawgiver.dec"
 //EOF

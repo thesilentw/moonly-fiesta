@@ -5,6 +5,7 @@
 //weapons
 #include "mfzscript/grenade.zsc"
 #include "mfzscript/lawgiver.zsc"
+#include "mfzscript/scatterpistol.zsc"
 
 //player
 #include "mfzscript/labrat.zsc"
