@@ -1,4 +1,4 @@
-class Labpistol : DoomWeapon {
+class Labpistol : MFWeapon {
 	default {
 		Weapon.SlotNumber 2;
 		Weapon.SelectionOrder 2500;

@@ -1,13 +1,21 @@
-// enemies
-#include "mfzscript/superrev.zsc"
-#include "mfzscript/chaserbarrel.zsc"
+version "3.4"
+// prototypes
+#include "mfzscript/mfweapon.zsc"
+
+//player
+#include "mfzscript/labrat.zsc"
 
 //weapons
 #include "mfzscript/grenade.zsc"
 #include "mfzscript/lawgiver.zsc"
 #include "mfzscript/scatterpistol.zsc"
+#include "mfzscript/bloodtester.zsc"
+#include "mfzscript/bullgut.zsc"
+#include "mfzscript/turipist.zsc"
 
-//player
-#include "mfzscript/labrat.zsc"
+// enemies
+#include "mfzscript/superrev.zsc"
+#include "mfzscript/chaserbarrel.zsc"
+
 
 //eof

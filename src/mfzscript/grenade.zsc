@@ -1,4 +1,4 @@
-Class GrenThrower : Weapon {
+Class GrenThrower : MFWeapon {
 
 	default {
 		Radius 20;
@@ -9,7 +9,6 @@ Class GrenThrower : Weapon {
 		Weapon.AmmoUse 1;
 		Weapon.AmmoGive 999;
 		Weapon.AmmoType "RocketAmmo";
-		//Weapon.Kickback 100;
 		Weapon.SlotNumber 5;
 		Inventory.PickupMessage "Grabbed some Grenades.";	
 	}
@@ -19,30 +18,29 @@ Class GrenThrower : Weapon {
 			LAUN A -1;
 			Stop;
 		Ready:
-			MISG A 1 A_WeaponReady();
+			TGRN A 1 A_WeaponReady();
 			Loop;
 		Deselect:
-			MISG A 1 A_Lower();
+			TGRN A 1 A_Lower();
 			Loop;
 		Select: 
-			MISG A 1 A_Raise();
+			TGRN A 1 A_Raise();
 			Loop;
 		Fire: 
-			MISG B 8 A_GunFlash();
-			MISG B 12 A_FireProjectile("GrenTearThrown",0,1,0,0,0,-1);
-			MISG B 0 A_ReFire();
+			TGRN A 10 A_PlaySound("weapons/grenade_pinpull", CHAN_WEAPON);
+		Holding:
+			TGRN A 15;
+			TNT1 A 0 A_Refire("Holding");
+			Goto Throw;
+		Throw:
+			TGRN B 15 A_FireProjectile("GrenMIRVThrown", 0, 1, 0, 0, 0, -1);
+			TGRN C 30;
 			Goto Ready;
-		Flash: 
-			MISF A 3 bright A_Light1();
-			MISF B 4 bright;
-			MISF C 4 bright A_Light2();
-			MISF D 4 bright A_Light2();
-			Goto LightDone;
 	}	
 }
 
 
-Class GrenFragThrown : Grenade {
+Class GrenFragThrown : Actor {
 	
 	bool logDeath, logGrenade, logDetonate, logMushroom, logAll;
 
@@ -52,20 +50,20 @@ Class GrenFragThrown : Grenade {
 	}
 	
 	default {
-		Radius 4;
-        Height 4;
-        Speed 55;
-        Scale 0.35;
+		Radius 8;
+        Height 8;
+        Speed 50;
+        Scale 0.5;
         DamageFunction (random(20,30));
         BounceType "Doom";
-        //BounceSound "grenade/bounce";
-        BounceFactor 0.35;
-        WallBounceFactor 0.75;
-        Gravity 0.15;
+        BounceFactor 0.25; //.35
+        WallBounceFactor 0.40; //.75
+        Gravity 0.60;
         ReactionTime 85;
         Species "Grenade";
         DamageType "Explosive";
         Projectile;
+		DeathSound "weapons/thumper_explosionamped";
         +THRUGHOST
         +THRUSPECIES
         +BOUNCEONWALLS
@@ -82,6 +80,7 @@ Class GrenFragThrown : Grenade {
         +CANBOUNCEWATER
         +DONTBLAST
         +DONTTHRUST
+		+ROCKETTRAIL
 		Obituary "Once you've pulled the pin on Mr. Grenade, he is no longer your friend, %o.";
 	}
 	
@@ -93,43 +92,127 @@ Class GrenFragThrown : Grenade {
 			MISL B 8 Bright {
 				if (logAll) {
 					Console.printf("projectile went to death state");
-				}
-				A_Explode();
+				}	
 			}
+			MISL B 15 A_Explode();
 			MISL C 6 Bright;
 			MISL D 4 Bright;
 			Stop;
- 		// this all never happens, for some fucked up reason.
-		/*
-		Grenade:
-			MISL A 100 { 
-				if (logAll) {
-					Console.printf("projectile went to grenade state");
-				}
-				resolveState("Death");
-			}
-			Wait;
-		Detonate:
-			MISL B 4 {
-				if (logAll) {
-					Console.printf("projectile went to detonate state");
-				}
-				A_Scream();
-			}
-			MISL C 6 A_Detonate();
-			MISL D 10;
-			Stop;
-		Mushroom:
-			MISL B 8 {
-				if (logAll) {
-					Console.printf("projectile went to mushroom state");
-				}
-				A_Mushroom();
-			}
-			Goto Death+1;
-			*/
 	}
 }
+
+Class GrenMIRVThrown : GrenFragThrown {
+
+	default {
+		BounceType "None";
+		BounceFactor 0.0;
+        WallBounceFactor 0.0;
+	}
+
+	override void PostBeginPlay() {
+		logAll = true;
+		super.PostBeginPlay();
+	}
+	
+	States {
+		Spawn:
+			SGRN A 1 Bright;
+			Loop;
+		Death:
+			TNT1 A 0 {
+				int subCount = 8;
+				int subAngleMult = 45;
+				while (subCount > 0) {
+					A_SpawnItemEx("GrenMIRVSubmun", 0, 0, random(0,5), 0.12, 0, 0.15, ((subAngleMult*subCount)+random(-10,10)), SXF_NOCHECKPOSITION | SXF_TRANSFERTRANSLATION | SXF_MULTIPLYSPEED);
+					if (logAll) {
+						Console.printf("MIRV child spawned, angle %i", subAngleMult*subCount);
+					}
+					subCount--;
+				}
+				
+				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 1, 1, 0.1, 45, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
+				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 1, 0, 0.1, 90, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
+				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 1, -1, 0.1, 135, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
+				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 0, -1, 0.1, 180, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
+				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, -1, -1, 0.1, 225, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
+				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, -1, 0, 0.1, 270, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
+				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, -1, 1, 0.1, 315, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
+			}
+			MISL B 10 Bright {
+				if (logAll) {
+					Console.printf("MIRV parent went to death state");
+				}
+				A_Explode();				
+			}			
+			MISL C 6 Bright;
+			MISL D 4 Bright;
+			Stop;
+	}
+
+}
+
+Class GrenMIRVSubmun : GrenFragThrown {
+
+	int lifetime;
+	
+	property lifetime: lifetime;
+	
+	default {
+		GrenMIRVSubmun.lifetime 35;
+		BounceFactor 0.35;
+        WallBounceFactor 0.35;
+		Gravity 0.85;
+        Scale 0.35;
+        DamageFunction (random(10,20));
+		DeathSound "";
+	}
+
+	override void PostBeginPlay() {
+		logAll = true;
+		super.PostBeginPlay();
+	}
+	
+	States {
+		Spawn:
+			SGRN A 10 Bright; //A_ChangeVelocity(x:25, y:vely, z:velz, flags:CVF_RELATIVE);
+			Goto Flight;
+		Flight:
+			SGRN A 1 Bright;
+			Loop;
+		Death:
+			SGRN A 1 {
+				if (logAll) {Console.printf("MIRV submunition went to death state");}
+			}
+			SGRN A 5 A_Jump(256, "Delay1","Delay2","Delay3","Delay4","Delay5","Delay6");
+		Delay1:	
+			SGRN A 1;
+			TNT1 A 0 A_Jump(256, "Boom");
+		Delay2:	
+			SGRN A 10;
+			TNT1 A 0 A_Jump(256, "Boom");
+		Delay3:	
+			SGRN A 20;
+			TNT1 A 0 A_Jump(256, "Boom");
+		Delay4:	
+			SGRN A 25;
+			TNT1 A 0 A_Jump(256, "Boom");
+		Delay5:	
+			SGRN A 7;
+			TNT1 A 0 A_Jump(256, "Boom");
+		Delay6:	
+			SGRN A 15;
+			TNT1 A 0 A_Jump(256, "Boom");
+		Boom:
+			MISL B 6 Bright {
+				A_PlaySound("weapons/mirv_explosion", CHAN_AUTO);
+				A_Explode();
+			}
+			MISL C 5 Bright;
+			MISL D 4 Bright;
+			Stop;
+	}
+}
+
 
 Class GrenTearThrown: GrenFragThrown {
 		
@@ -166,13 +249,12 @@ Class GrenTearThrown: GrenFragThrown {
 	
 }
 
-
 Class tearGasCloud : Actor {
 
-	int stateCount;
+	int gasDuration;
 	int cloudRadius;
 	
-	property GasDuration: stateCount;
+	property gasDuration: gasDuration;
 	property cloudRadius: cloudRadius;
 	
 	default {
@@ -191,7 +273,7 @@ Class tearGasCloud : Actor {
 		//PoisonDamage 10, 10, 35;
 		//+FOILINVUL
 		//+CANBLAST
-		//+BLOODLESSIMPACT
+		+BLOODLESSIMPACT
 		//+BLOCKEDBYSOLIDACTORS
 		RenderStyle "Translucent";
 		Alpha 0.4;
@@ -208,8 +290,8 @@ Class tearGasCloud : Actor {
 			GTXM ABCD 10 A_Explode(1, invoker.cloudRadius, XF_HURTSOURCE, false, invoker.cloudRadius);
 			GTXM E 10 {
 				A_Explode(1, invoker.cloudRadius, XF_HURTSOURCE, false, invoker.cloudRadius);
-				if (invoker.stateCount > 0) {
-					invoker.stateCount--;
+				if (invoker.gasDuration > 0) {
+					invoker.gasDuration--;
 					return resolveState("CloudLoop");
 					}
 				else return resolveState("Death");

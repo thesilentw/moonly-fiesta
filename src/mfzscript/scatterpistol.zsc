@@ -1,11 +1,11 @@
-class scatpistol : DoomWeapon {
+class scatpistol : MFWeapon {
 	default {
 		Weapon.SlotNumber 2;
 		Weapon.SelectionOrder 2500;
 		Weapon.AmmoUse 1;
 		Weapon.AmmoGive 40;
 		Weapon.AmmoType "Clip";
-		Obituary "%o realized 'puny' is relative when you're talking about supersonic projectiles, thanks to %k.";
+		Obituary "test weapon please ignore";
 		Inventory.Pickupmessage "TEST SCATTERPISTOL";
 	}
 	
@@ -71,8 +71,6 @@ Class macepellet : FastProjectile {
 		stop;
 	}
 }
-
-
 
 class scatterballhit : Actor {
 	default {
