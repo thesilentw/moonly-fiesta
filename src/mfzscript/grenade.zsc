@@ -1,3 +1,5 @@
+/// all the grenade shit in one place
+
 Class GrenThrower : MFWeapon {
 
 	default {
@@ -38,7 +40,6 @@ Class GrenThrower : MFWeapon {
 			Goto Ready;
 	}	
 }
-
 
 Class GrenFragThrown : Actor {
 	
@@ -213,7 +214,6 @@ Class GrenMIRVSubmun : GrenFragThrown {
 	}
 }
 
-
 Class GrenTearThrown: GrenFragThrown {
 		
 	default {
@@ -303,4 +303,202 @@ Class tearGasCloud : Actor {
 			}
 			Stop;
 	}
+}
+
+
+/* /// 
+Grenade Launcher:
+8-chamber cylinder
+Fire fires the current chamber
+Altfire advances the chamber by 1
+Reload changes the type of ammo in the current chamber
+user1 reloads all chambers with the current chamber's ammotype
+/// */
+
+Class GrenLauncher : MFWeapon {
+	int[8] magazine;
+	int chamberIndex;
+	int previousAmmoIndex;
+	int currentlyLoaded;
+	
+	static const String ammoTypes[] = {
+		"Unloaded",
+		"Frag",
+		"Gas",
+		"MIRV",
+		"Shock",
+		"Flame",
+		"Bees"
+	};
+	
+	/*enum ammoTypes {
+		Unloaded,
+		Frag,
+		Gas,
+		MIRV,
+		Shock,
+		Flame,
+		Bees
+	};*/
+	
+	
+	property chamberIndex: chamberIndex;
+	property previousAmmoIndex: previousAmmoIndex;
+	property currentlyLoaded: currentlyLoaded;
+	
+	default {
+		inventory.pickupMessage "Grabbed a Grenade Launcher! Lots of ammo types to choose from...";
+		Weapon.AmmoUse 1;
+		Weapon.AmmoGive 10;
+		Weapon.AmmoType "RocketAmmo";
+		weapon.slotNumber 5;
+		weapon.SelectionOrder 3500;
+		//Weapon.BobStyle "None";
+		Weapon.BobRangeX 0.0;
+		Weapon.BobRangeY 0.0;
+		+WEAPON.NODEATHINPUT
+		+WEAPON.AMMO_OPTIONAL
+		+WEAPON.NOAUTOFIRE
+		+WEAPON.NOAUTOAIM
+		//weapon.upsound "DSSGCOCK";
+		GrenLauncher.chamberIndex 0;
+		GrenLauncher.previousAmmoIndex 1; //start off with Frag as last selected so that an initial BigReload works correctly
+		GrenLauncher.currentlyLoaded 0; //starts off empty
+	}
+
+	
+	States {
+		Spawn:
+			TLGL A -1;
+			Stop;
+		Ready:
+			GRLN A 1 A_WeaponReady(WRF_ALLOWUSER1|WRF_ALLOWRELOAD);
+			Loop;
+		Select:
+			GRLN A 1 A_Raise();
+			Loop;
+		Deselect:
+			GRLN A 1 A_Lower();
+			Loop;
+		Fire:
+			GRLN A 1 {
+				switch( invoker.magazine[invoker.chamberIndex]) {
+					case 0:
+						return ResolveState("Unloaded");
+						break;
+					case 1:
+						return ResolveState("Frag");
+						break;
+					case 2:
+						return ResolveState("Gas");
+						break;
+					case 3:
+						return ResolveState("MIRV");
+						break;
+					/*
+					case 4:
+						return ResolveState("Shock");
+						break;
+					case 5:				
+						return ResolveState("Flame");
+						break;
+					case 6:			
+						return ResolveState("Bees");
+						break;
+					*/
+					default:
+						return ResolveState("Unloaded");
+				}
+				return ResolveState("Unloaded");
+			}
+		Frag:
+			GRLN E 4 {
+				A_PlaySound("weapons/thumper_fireamped", CHAN_WEAPON);
+				A_FireProjectile("GrenFragThrown", useammo: 0, spawnofs_xy: 3.5,  flags: FPF_NOAUTOAIM, pitch: -5.0);
+				invoker.previousAmmoIndex = 1;
+				invoker.magazine[invoker.chamberIndex] = 0;
+			}
+			Goto AdvanceChamber;
+		Gas:
+			GRLN E 4 {
+				A_PlaySound("weapons/thumper_fireamped", CHAN_WEAPON);
+				A_FireProjectile("GrenTearThrown", useammo: 0, spawnofs_xy: 3.5,  flags: FPF_NOAUTOAIM, pitch: -5.0);
+				invoker.previousAmmoIndex = 2;
+				invoker.magazine[invoker.chamberIndex] = 0;
+			}
+			Goto AdvanceChamber;
+		MIRV:
+			GRLN E 4 {
+				A_PlaySound("weapons/thumper_fireamped", CHAN_WEAPON);
+				A_FireProjectile("GrenMIRVThrown", useammo: 0, spawnofs_xy: 3.5,  flags: FPF_NOAUTOAIM, pitch: -5.0);
+				invoker.previousAmmoIndex = 3;
+				invoker.magazine[invoker.chamberIndex] = 0;
+			}
+			Goto AdvanceChamber;
+		Shock:
+		Flame:
+		Bees:
+		Unloaded:
+			//TNT1 A 0 A_StopSound(CHAN_WEAPON);
+			GRLN A 5 A_PlaySound("weapons/jugg_dry");
+			Goto Ready;		
+		
+		AltFire:
+			Goto SwapAmmo;
+		Reload:
+			Goto BigReload;
+		User1:
+			Goto AdvanceChamber;
+			
+		AdvanceChamber:
+			GRLN A 3;
+			GRLN C 3 A_PlaySound("weapons/jugg_reload2", CHAN_AUTO);
+			GRLN B 3;
+			GRLN A 2 {
+				if (invoker.chamberIndex >= 7) {
+					invoker.chamberIndex = 0;
+				}
+				else {
+					invoker.chamberIndex++;
+				}
+				Console.printf("chamber advanced to chamber %i", invoker.chamberIndex);
+			}
+			Goto Ready;
+		
+		SwapAmmo:
+			GRLN A 10 {
+				A_PlaySound("weapons/thumper_reloadshort", CHAN_AUTO);
+				invoker.previousAmmoIndex = invoker.magazine[invoker.chamberIndex];
+				if (invoker.magazine[invoker.chamberIndex] <= 3) {
+					invoker.magazine[invoker.chamberIndex] += 1;
+				}
+				else {
+					invoker.magazine[invoker.chamberIndex] = 1;
+				}
+				Console.printf("chamber %i loaded with %s, previously %s", invoker.chamberIndex, GrenLauncher.ammoTypes[invoker.magazine[invoker.chamberIndex]], GrenLauncher.ammoTypes[invoker.previousAmmoIndex]);
+			}
+			Goto Ready;
+			
+
+		BigReload:
+			TNT1 A 0 {
+				invoker.currentlyLoaded = invoker.magazine[invoker.chamberIndex];
+				if (invoker.currentlyLoaded == 0) {
+					Console.printf("currently loaded ammo is %s (should be Unloaded!), loading previous type (%s)", (GrenLauncher.ammoTypes[invoker.currentlyLoaded]), GrenLauncher.ammoTypes[invoker.previousAmmoIndex]);
+					invoker.currentlyLoaded = invoker.previousAmmoIndex;
+				}
+				else {
+					Console.printf("currently loaded ammo is %s, using that", GrenLauncher.ammoTypes[invoker.currentlyloaded]);
+				}
+				for (int curcham = 0; curcham < 8; curcham++) {
+						invoker.magazine[curcham] = invoker.currentlyLoaded;
+						Console.printf("loaded chamber %i with %s", curcham, GrenLauncher.ammoTypes[invoker.currentlyLoaded]);
+				}
+				
+			}
+			GRNL AAAAAAAA 6 A_PlaySound("weapons/thumper_reloadshort", CHAN_AUTO);
+			Goto Ready;
+
+	}
+
 }

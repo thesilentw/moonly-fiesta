@@ -12,6 +12,8 @@ version "3.4"
 #include "mfzscript/bloodtester.zsc"
 #include "mfzscript/bullgut.zsc"
 #include "mfzscript/turipist.zsc"
+#include "mfzscript/axe.zsc"
+#include "mfzscript/colorgun.zsc"
 
 // enemies
 #include "mfzscript/superrev.zsc"
