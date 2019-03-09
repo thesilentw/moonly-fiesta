@@ -1,4 +1,5 @@
 Class Labrat : DoomPlayer {
+	
 	int labrat_tox_level;
 	int labrat_tox_crippled;
 	int labrat_tox_dead;
@@ -8,27 +9,35 @@ Class Labrat : DoomPlayer {
 	// TEST VARS - use these to test shaders, gameplay situations, etc.
 	bool testRedoutShader;
 	bool testGasShader;
-	// END TEST VARS
-	
-	
+			
 	//DRUG VARS - purple, red, blue, yellow, orange, green, and white
 	int damageResist; //damage threshold given when using RED
 	
 	default {
-		Player.StartItem "Injector";
-		Player.StartItem "LabPistol";
-		Player.StartItem "Clip", 50;
+		//Player.StartItem "Injector";
+		Player.StartItem "RBLPistol";
+		//Player.StartItem "RBLShotgun";
+		//Player.StartItem "RBLChaingun";
+		//Player.StartItem "RBLRocketLauncher";
+		//Player.StartItem "RBLPlasmaRifle";
+		//Player.StartItem "RBLSuperShotgun";
+		//Player.StartItem "RBLBFG";
+		Player.StartItem "RBLFist";
+		Player.StartItem "Clip", 40;
+		//Player.StartItem "Clip", 999;
+		//Player.StartItem "Shell", 999;
+		//Player.StartItem "RocketAmmo", 999;
+		//Player.StartItem "Cell", 999;
 		Player.DisplayName "Labrat";
-		Player.ForwardMove 0.75, 0.75;
-		Player.RunHealth 15;
-		Player.SideMove 0.75, 0.75;
+		//Player.ForwardMove 0.75, 0.75;
+		//Player.RunHealth 15;
+		//Player.SideMove 0.75, 0.75;
 		Player.ViewBob 0.5;
-		Player.MaxHealth 125;
+		//Player.MaxHealth 125;
 	}
 	
 	//setup fxns
 	override void PostBeginPlay() {
-		super.PostBeginPlay();
 		player = players[consoleplayer];
 		labrat_tox_level = 0;
 		labrat_tox_dead = 1000;
@@ -37,6 +46,8 @@ Class Labrat : DoomPlayer {
 		
 		testRedoutShader = true;
 		testGasShader = false;
+		
+		super.PostBeginPlay();
 	}	
 	
 	//
@@ -123,9 +134,4 @@ Class Labrat : DoomPlayer {
 		}
 	}
 }
-
-
-// weapon includes
-#include "mfzscript/labpistol.zsc"
-#include "mfzscript/injector.zsc"
 //eof
