@@ -10,21 +10,7 @@ class Bullgut : MFWeapon {
 		+weapon.ammo_optional;
 		weapon.upsound "weapons/bullgut_select";
 	}
-	
-	/*
-	TNT1 A 0 A_FireBullets (0, 0, -1, 7, "BulletPuff", FBF_NORANDOM | FBF_EXPLICITANGLE) //center proj
-	TNT1 A 0 A_FireBullets (1.45, 0, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) //right mid proj
-	TNT1 A 0 A_FireBullets (-1.45, 0, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) //left mid proj 
-	TNT1 A 0 A_FireBullets (0, 1.3, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) //top proj
-	TNT1 A 0 A_FireBullets (0, -1.3, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) // bottom proj
-	TNT1 A 0 A_FireBullets (1, 0.9, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) //top right proj
-	TNT1 A 0 A_FireBullets (-1, 0.9, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) //bottom right proj
-	TNT1 A 0 A_FireBullets (1, -0.9, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) //top left proj
-	TNT1 A 0 A_FireBullets (-1, -0.9, -1, 7, "BulletPuff", FBF_EXPLICITANGLE) //bottom left proj
-	*/
-	
-	
-	
+
 	States {
 		Ready:
 			BLGT A 1 A_WeaponReady();
@@ -37,14 +23,16 @@ class Bullgut : MFWeapon {
 			Loop;
 		Fire:
 			BLGT A 1;
-			BLGT AABBCCCDDD 4 { 
+			BLGT AAAAAA 4 {  
 				A_FireProjectile("SpiralMis", angle: frandom(-2.0,4.0), useammo: false, flags: FPF_NOAUTOAIM, pitch: frandom(-2.5,1.5));
 				A_PlaySound("weapons/bullgut_fire",CHAN_WEAPON);
-			}
-			BLGT A 20;
-			BLGT A 25 A_PlaySound("weapons/jugg_reload1",CHAN_BODY);
-			BLGT A 30 A_PlaySound("weapons/jugg_reload2",CHAN_BODY);
-			//BLGT A 1 A_ReFire();
+				A_WeaponOffset(0, 1.5, WOF_ADD);
+				A_QuakeEx(1, 1, 2, 4, 0, 30, "", flags: QF_RELATIVE|QF_SCALEDOWN);
+				}
+			BLGT A 10 A_WeaponOffset(0, -9, WOF_ADD);
+			BLGT A 13 A_PlaySound("weapons/jugg_reload1",CHAN_BODY);
+			BLGT A 25 A_PlaySound("weapons/jugg_reload2",CHAN_BODY);
+			BLGT A 10;
 			Goto Ready;
 		Spawn:
 			TLGL A -1;
@@ -52,17 +40,17 @@ class Bullgut : MFWeapon {
 	}
 }	
 
-Class SpiralMis : Rocket {
+Class SpiralMis : FastProjectile {
 	default {
 		Decal "DoomImpScorch";
 		damage 0;
-		Speed 55;
+		Speed 50;
 		height 8;
 		radius 8;
-		Scale 1;
+		Scale 0.8;
 		alpha 0.95;
 		-RANDOMIZE;
-		+ROCKETTRAIL;
+		//+ROCKETTRAIL;
 		WeaveIndexXY 16;
 		WeaveIndexZ 32;
 	}
@@ -74,18 +62,18 @@ Class SpiralMis : Rocket {
 			goto flight;
 		
 		Flight:
-			MISL A 1 A_ChangeVelocity (1.1, random(-1.5,1.5), random(-0.5,0.5), CVF_RELATIVE);
+			MISL A 1 A_ChangeVelocity (1.1, frandom(-1.5,1.5), frandom(-0.5,0.5), CVF_RELATIVE);
 			MISL A 4 A_Weave(10, 10, 2.0, 2.0);
 			//MISL A 1;
 			loop;
 		
 		Death:
-			MISL B 8 Bright { 
+			MISL B 4 Bright { 
 				A_Explode();
 				A_PlaySound("weapons/bullgut_impact",CHAN_AUTO);
 			}
-			MISL C 6 Bright;
-			MISL D 4 Bright;
+			MISL C 3 Bright;
+			MISL D 2 Bright;
 			Stop;
 	}
 }
@@ -94,7 +82,6 @@ Class SpiralMis : Rocket {
 
 Class TestMis : Rocket {
 	default {
-		//+PROJECTILE;
 		damage 0;
 		Speed 45;
 		height 8;
@@ -107,23 +94,23 @@ Class TestMis : Rocket {
 	}
 	states {
 		Spawn:
-			MISL A 1; //A_SpawnProjectile("MissileTrail");
-			MISL A 1 A_ChangeVelocity (1.1, random(-5.0,5.0), random(0.0,2.5), CVF_RELATIVE);
-			MISL A 1; //A_SpawnProjectile("MissileTrail");
-			MISL A 0 A_SeekerMissile(2.5,2,SMF_LOOK,64,5);
-			MISL A 1 A_ChangeVelocity (1.1, random(-5.0,5.0), random(-2.0,3.0), CVF_RELATIVE); 
-			MISL A 1; //A_SpawnProjectile("MissileTrail");
-			MISL A 0 A_SeekerMissile(2.5,2,SMF_LOOK,64,5);
-			MISL A 1 A_ChangeVelocity (1.1, random(-5.0,5.0), random(-4.0,4.0), CVF_RELATIVE);
+			MISL A 1;
+			MISL A 1 A_ChangeVelocity (1.1, frandom(-5.0,5.0), frandom(0.0,2.5), CVF_RELATIVE);
+			MISL A 1;
+			MISL A 1 A_SeekerMissile(2.5,2,SMF_LOOK,64,5);
+			MISL A 1 A_ChangeVelocity (1.1, frandom(-5.0,5.0), frandom(-2.0,3.0), CVF_RELATIVE); 
+			MISL A 1;
+			MISL A 1 A_SeekerMissile(2.5,2,SMF_LOOK,64,5);
+			MISL A 1 A_ChangeVelocity (1.1, frandom(-5.0,5.0), frandom(-4.0,4.0), CVF_RELATIVE);
 			goto flight;
 		
 		Flight:
-			MISL A 1 A_SeekerMissile(2.5,2,SMF_LOOK,64,5);
-			MISL A 1 A_Weave(2,2,6.0,6.0);
-			MISL A 1 A_ChangeVelocity (1.5, random(-5.0,5.0), random(-2.5,2.5), CVF_RELATIVE); 
-			MISL AA 1; //A_SpawnProjectile("MissileTrail");
-			MISL A 1 A_SeekerMissile(1.1,1,SMF_LOOK,64,5);
-			MISL A 1 A_Weave(2,2,6.0,6.0);
+			MISL A 3 A_SeekerMissile(2.5,2,SMF_LOOK,64,5);
+			MISL A 5 A_Weave(2,2,6.0,6.0);
+			MISL A 1; //A_ChangeVelocity (1.5, frandom(-5.0,5.0), frandom(-2.5,2.5), CVF_RELATIVE); 
+			MISL A 2;
+			MISL A 3 A_SeekerMissile(1.1,1,SMF_LOOK,64,5);
+			MISL A 5 A_Weave(2,2,6.0,6.0);
 			loop;
 		
 		Death:

@@ -14,20 +14,23 @@ Class Labrat : DoomPlayer {
 	int damageResist; //damage threshold given when using RED
 	
 	default {
-		//Player.StartItem "Injector";
-		Player.StartItem "RBLPistol";
+		Player.StartItem "Injector";
+		Player.StartItem "GrenLauncher";
+		Player.StartItem "Bullgut";
+		Player.StartItem "ColorGun";;
+		//Player.StartItem "RBLPistol";
 		//Player.StartItem "RBLShotgun";
 		//Player.StartItem "RBLChaingun";
 		//Player.StartItem "RBLRocketLauncher";
 		//Player.StartItem "RBLPlasmaRifle";
 		//Player.StartItem "RBLSuperShotgun";
 		//Player.StartItem "RBLBFG";
-		Player.StartItem "RBLFist";
-		Player.StartItem "Clip", 40;
-		//Player.StartItem "Clip", 999;
-		//Player.StartItem "Shell", 999;
-		//Player.StartItem "RocketAmmo", 999;
-		//Player.StartItem "Cell", 999;
+		//Player.StartItem "RBLFist";
+		//Player.StartItem "Clip", 40;
+		Player.StartItem "Clip", 999;
+		Player.StartItem "Shell", 999;
+		Player.StartItem "RocketAmmo", 999;
+		Player.StartItem "Cell", 999;
 		Player.DisplayName "Labrat";
 		//Player.ForwardMove 0.75, 0.75;
 		//Player.RunHealth 15;

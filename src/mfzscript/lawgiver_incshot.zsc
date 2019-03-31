@@ -157,7 +157,7 @@ class ActorOnFire : Actor {
 
 // Setting on fire of actors taken from TerminusEst13's High Noon Drifter.
 class FireTexturesOnActorWithLifetime : Actor {
-    int randomx, randomy, randomz;
+    float randomx, randomy, randomz;
     int lifetime, lifecheck;
     int chance;
 

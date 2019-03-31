@@ -124,20 +124,12 @@ Class GrenMIRVThrown : GrenFragThrown {
 				int subCount = 8;
 				int subAngleMult = 45;
 				while (subCount > 0) {
-					A_SpawnItemEx("GrenMIRVSubmun", 0, 0, random(0,5), 0.12, 0, 0.15, ((subAngleMult*subCount)+random(-10,10)), SXF_NOCHECKPOSITION | SXF_TRANSFERTRANSLATION | SXF_MULTIPLYSPEED);
+					A_SpawnItemEx("GrenMIRVSubmun", xofs: 0.0, yofs: 0.0, zofs: FRandom(0.0, 5.0), xvel: 0.12, yvel: 0, zvel: 0.15, angle: ((subAngleMult*subCount)+random(-10,10)), flags: SXF_NOCHECKPOSITION | SXF_TRANSFERTRANSLATION | SXF_MULTIPLYSPEED);
 					if (logAll) {
 						Console.printf("MIRV child spawned, angle %i", subAngleMult*subCount);
 					}
 					subCount--;
 				}
-				
-				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 1, 1, 0.1, 45, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
-				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 1, 0, 0.1, 90, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
-				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 1, -1, 0.1, 135, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
-				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, 0, -1, 0.1, 180, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
-				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, -1, -1, 0.1, 225, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
-				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, -1, 0, 0.1, 270, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
-				//A_SpawnItemEx("GrenMIRVSubmun", 0, 0, 5, -1, 1, 0.1, 315, SXF_NOCHECKPOSITION | SXF_MULTIPLYSPEED);
 			}
 			MISL B 10 Bright {
 				if (logAll) {
