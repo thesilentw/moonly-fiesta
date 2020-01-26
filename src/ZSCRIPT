@@ -27,6 +27,7 @@ version "3.4"
 #include "mfzscript/turipist.zsc"
 #include "mfzscript/axe.zsc"
 #include "mfzscript/colorgun.zsc"
+#include "mfzscript/dualies.zsc"
 
 // enemies
 //#include "mfzscript/superrev.zsc"
