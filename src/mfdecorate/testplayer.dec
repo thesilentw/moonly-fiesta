@@ -1,0 +1,4 @@
+ACTOR TestPlayer : DoomPlayer {
+	Player.StartItem "Handgun"
+	Player.StartItem "Clip", 200
+}

@@ -39,14 +39,12 @@ Class testproj : FastProjectile {
 	default {
 		+FORCEXYBILLBOARD;
 		+thruspecies;
-		damage 30;
 		missileheight 8;
 		speed 155;
 		height 8;
 		radius 8;
 		Scale 1;
 		alpha 0.95;
-		decal "BulletChip";
 		+HITTRACER;
 	}
 	
@@ -62,14 +60,12 @@ Class testproj : FastProjectile {
 					double temp2 = tracer.BloodColor;
 					String temp3 = tracer.Species;
 					Console.printf("bloodtester hit target, bloodtype %s, blood color %d, species %s", temp, temp2, temp3);
-					//else Console.printf("invalid blood type");
 				}
 				else {
 					Console.printf("invalid tracer pointer");
 				}
 				
 			}
-			//TNT1 A 1 a_spawnitemex ("scatterballhit",-5,-5,0,frandom(-2,-8),frandom(-8,8),frandom(5,10),0,SXF_NOCHECKPOSITION);
 			stop;
 	}
 

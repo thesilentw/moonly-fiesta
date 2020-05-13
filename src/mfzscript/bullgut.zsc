@@ -23,13 +23,13 @@ class Bullgut : MFWeapon {
 			Loop;
 		Fire:
 			BLGT A 1;
-			BLGT AAAAAA 4 {  
+			BLGT AAAAAAA 4 {  
 				A_FireProjectile("SpiralMis", angle: frandom(-2.0,4.0), useammo: false, flags: FPF_NOAUTOAIM, pitch: frandom(-2.5,1.5));
 				A_PlaySound("weapons/bullgut_fire",CHAN_WEAPON);
-				A_WeaponOffset(0, 1.5, WOF_ADD);
+				A_WeaponOffset(frandom(-2,2), frandom(2.5, 4), WOF_ADD);
 				A_QuakeEx(1, 1, 2, 4, 0, 30, "", flags: QF_RELATIVE|QF_SCALEDOWN);
 				}
-			BLGT A 10 A_WeaponOffset(0, -9, WOF_ADD);
+			BLGT A 10;
 			BLGT A 13 A_PlaySound("weapons/jugg_reload1",CHAN_BODY);
 			BLGT A 25 A_PlaySound("weapons/jugg_reload2",CHAN_BODY);
 			BLGT A 10;

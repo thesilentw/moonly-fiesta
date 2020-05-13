@@ -35,7 +35,7 @@ Class GrenThrower : MFWeapon {
 			TNT1 A 0 A_Refire("Holding");
 			Goto Throw;
 		Throw:
-			TGRN B 15 A_FireProjectile("GrenMIRVThrown", 0, 1, 0, 0, 0, -1);
+			TGRN B 15 A_FireProjectile("GrenFragThrown", 0, 1, 0, 0, 0, -1);
 			TGRN C 30;
 			Goto Ready;
 	}	
@@ -262,15 +262,9 @@ Class tearGasCloud : Actor {
 		+DONTSPLASH
 		+FLOAT
 		FloatSpeed 10;
-		//PoisonDamage 10, 10, 35;
-		//+FOILINVUL
-		//+CANBLAST
 		+BLOODLESSIMPACT
-		//+BLOCKEDBYSOLIDACTORS
 		RenderStyle "Translucent";
 		Alpha 0.4;
-		//DeathSound "PoisonShroomDeath";
-		//DamageType TearGas;
 	}	
 	States {
 		Spawn:
@@ -323,17 +317,6 @@ Class GrenLauncher : MFWeapon {
 		"Bees"
 	};
 	
-	/*enum ammoTypes {
-		Unloaded,
-		Frag,
-		Gas,
-		MIRV,
-		Shock,
-		Flame,
-		Bees
-	};*/
-	
-	
 	property chamberIndex: chamberIndex;
 	property previousAmmoIndex: previousAmmoIndex;
 	property currentlyLoaded: currentlyLoaded;
@@ -345,14 +328,12 @@ Class GrenLauncher : MFWeapon {
 		Weapon.AmmoType "RocketAmmo";
 		weapon.slotNumber 5;
 		weapon.SelectionOrder 3500;
-		//Weapon.BobStyle "None";
 		Weapon.BobRangeX 0.0;
 		Weapon.BobRangeY 0.0;
 		+WEAPON.NODEATHINPUT
 		+WEAPON.AMMO_OPTIONAL
 		+WEAPON.NOAUTOFIRE
 		+WEAPON.NOAUTOAIM
-		//weapon.upsound "DSSGCOCK";
 		GrenLauncher.chamberIndex 0;
 		GrenLauncher.previousAmmoIndex 1; //start off with Frag as last selected so that an initial BigReload works correctly
 		GrenLauncher.currentlyLoaded 0; //starts off empty
@@ -387,7 +368,6 @@ Class GrenLauncher : MFWeapon {
 					case 3:
 						return ResolveState("MIRV");
 						break;
-					/*
 					case 4:
 						return ResolveState("Shock");
 						break;
@@ -397,7 +377,6 @@ Class GrenLauncher : MFWeapon {
 					case 6:			
 						return ResolveState("Bees");
 						break;
-					*/
 					default:
 						return ResolveState("Unloaded");
 				}
@@ -431,7 +410,6 @@ Class GrenLauncher : MFWeapon {
 		Flame:
 		Bees:
 		Unloaded:
-			//TNT1 A 0 A_StopSound(CHAN_WEAPON);
 			GRLN A 5 A_PlaySound("weapons/jugg_dry");
 			Goto Ready;		
 		
