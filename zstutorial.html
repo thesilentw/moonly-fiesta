@@ -1,0 +1,305 @@
+<html>
+<head>
+	<style>
+	pre code {
+		font-family: monospace;
+		font-size: larger;
+		background-color: #ddd;
+		display: block;
+		padding: 1em;
+	}
+	html {
+		font-family: sans-serif;
+	}
+	</style>
+</head>
+
+<title>How 2 Gnu (But in ZScript!)</title>
+<h1>How 2 Gnu (But in ZScript!)</h1>
+
+<p>Hello, delicious friends, and welcome to <strong>HOW 2 GNU 2: 2 GNU 2 SCRIPTIER</strong>.<br><br>
+This tutorial assumes a few things:
+</p>
+<ul>
+<li>You've created a weapon/actor for GZDoom before</li>
+<li>You did with with DECORATE</li>
+<li>Someone mentioned this ZScript thing to you and said it was really cool and powerful...</li>
+<li>...Then you looked at some ZScript code and acquired <em>the fear</em>.</li>
+</ul>
+<p>
+Assuming the above is true, below is the code for our starting point - A standard pistol replacement, nothing special.</p>
+<pre><code>
+Actor TutorialPistol : Weapon {
+
+	Scale 0.75
+	Obituary "%k peppered %o with a puny pistol."
+	Radius 20
+	Height 16
+	AttackSound "weapons/pistol"
+	Inventory.PickupMessage "You picked up a Pistol!"
+	Weapon.SelectionOrder 400
+	Weapon.SlotNumber 2
+	Weapon.Kickback 100
+	Weapon.AmmoType "Clip"
+	Weapon.AmmoUse 1 
+	Weapon.AmmoGive 25
+
+	States {
+		Spawn:
+			TPIP A -1
+			Loop
+		Ready:
+			TPIS A 2 A_WeaponReady
+			Loop
+		Deselect:
+			TPIS D 1 A_Lower
+			Loop
+		Select:
+			TPIS F 1 A_Raise
+			Loop
+		Fire:
+			TPIS A 1    
+			TPIF A 3 Bright A_FireBullets(3, 3, 1, 5, "BulletPuff")
+			TPIS B 2 
+			TPIS C 2
+			TPIS A 2 A_ReFire
+			Goto Ready
+	}
+}
+
+</code></pre>
+<p>The sprites I used for the pistol are from <a href="https://forum.zdoom.org/viewtopic.php?f=37&t=36822">Chronoteeth's "Turok Style" pack</a>.<br>
+Note that I had to rename the sprites - TPIFA0 is the firing sprite, and TPIPA0 is the pickup sprite.<br>
+Take a minute to get the DECORATE version working before you move on. Confirm that everything is working as expected, or at least that you are aware of any existing issues.</p>
+<h2>All Is Prepared</h2>
+<p>Now, we're going to convert this pistol to ZScript, get it working, and then start to do some Wierd Things with it, using the <strong>eldritch powers</strong> of ZScript.</p>
+<h3>Actor Definition</h3>
+<p>The part at the very top of the file has to change just a little bit. ZScript is capable of creating much more complex things than DECORATE, so we're working with full classes, instead of just Actors:</p>
+<pre><code>
+class ZTutorialPistol : Weapon {
+
+</pre></code>
+<p>Simple, but representative of the future - ZScript has far more functionality than DECORATE, but requires a slightly wider understanding of GZDoom's under-the-hood systems.<br>
+Fortunately, you can get by with learning what you need at the moment, and only following up when and if it interests you... which often leads to fun tangents.
+</p>
+<h3>Properties</h3>
+<p>Next, we need to translate the properties of our pistol into a ZScript-friendly format. 
+<pre><code>
+	default {
+		Scale 0.75;
+		Radius 20;
+		Height 16;	
+		AttackSound "weapons/pistol";
+		Obituary "%k peppered %o with a powerful ZScript pistol!";
+		Inventory.Pickupmessage "Picked up a ZScript Pistol!";
+		Weapon.SelectionOrder 400;
+		Weapon.SlotNumber 2;
+		Weapon.Kickback 100;
+		Weapon.AmmoType "Clip";
+		Weapon.AmmoUse 1;
+		Weapon.AmmoGive 25;
+	}
+	
+</pre></code>
+ZScript more consistently uses formatting conventions from common programming languages - note the braces/curly brackets enclosing this block ( <strong>{}</strong> ), as well as the semicolons (<strong>;</strong> ) at the end of each line.<br>
+This block is often called the <strong>default properties</strong> block (or section, however you like to refer to it). In this section, you define all the properties you'd normally define at the very top of a DECORATE file, as well as any special properties you'd like to create - but we'll get to that later.</p>
+<h3>States</h3>
+<p>Now, we move on to states. They're also largely the same as the DECORATE version.</p>
+<pre><code>
+	States {
+		Spawn:
+			TPIP A -1;
+			Loop;
+		Ready:
+			TPIS A 1 A_WeaponReady();
+			Loop;
+		Deselect:
+			TPIS A 1 A_Lower();
+			Loop;
+		Select:
+			TPIS A 1 A_Raise();
+			Loop;
+		Fire:
+			TPIS A 1;
+			TPIF A 3 A_FireBullets(3, 3, 1, 5, "BulletPuff");
+			TPIS B 2;
+			TPIS C 2;
+			TPIS A 2 A_ReFire();
+			Goto Ready;
+	}
+
+</pre></code>
+<p>If you've renamed the sprites differently than I did, of course, insert your own sprite ids.</p>
+<p>Again, you'll see semicolons at the end of each line. But what's this cancer of parentheses we've developed? It turns out that all those special keywords you were using in DECORATE this whole time are actually function calls, so they need to be formatted as such. Most of them need no arguments, so the terminating parentheses are sufficient. <strong>A_FireBullets()</strong>, of course, needs several arguments in order to function properly.<br></p>
+<h3>Closing it Up</h3>
+<p>Close off your file with a closing brace ( } ) and you're nearly there. You still need a <strong>ZSCRIPT</strong> file in your mod's root directory, just like you need a <strong>DECORATE</strong> file. The syntax is exactly the same:
+<pre><code>
+#include "subdirectory/ztutorialpistol.zsc"
+
+</code></pre>
+<p>You don't have to name your ZScript files with the <strong>.zsc</strong> extension any more than you need to name DECORATE files with <strong>.dec</strong>, but it helps with identification, especially if you're using both in one project!
+</p>
+<h3>See code run. Run, code, run.</h3>
+<p>Now it's time to launch GZDoom with our test mod! You know the drill: <strong>give ztutorialpistol</strong> in the console, and go to town!</p>
+<h2>I was promised ELDRICH HORRORS!</h2>
+<p>Oh, it's coming. In fact, let's just put all our cards on the table:</p>
+<pre><code>
+class ZRapidPistol : Weapon {
+	
+	bool fastMode;
+	
+	property fastMode: fastMode;
+	
+	default {
+		ZRapidPistol.fastMode False;
+		Scale 0.75;
+		Radius 20;
+		Height 16;	
+		AttackSound "weapons/pistol";
+		Obituary "%k peppered %o with a powerful ZScript pistol!";
+		Inventory.Pickupmessage "Picked up a ZScript Pistol!";
+		Weapon.SelectionOrder 400;
+		Weapon.SlotNumber 2;
+		Weapon.Kickback 100;
+		Weapon.AmmoType "Clip";
+		Weapon.AmmoUse 1;
+		Weapon.AmmoGive 25;
+	}
+	
+	States {
+		Spawn:
+			TPIP A -1;
+			Loop;
+		Ready:
+			TPIS A 1 A_WeaponReady();
+			Loop;
+		Deselect:
+			TPIS A 1 A_Lower();
+			Loop;
+		Select:
+			TPIS A 1 A_Raise();
+			Loop;
+		Fire:
+			TPIS A 1 {
+				if (invoker.fastMode) {
+					return ResolveState("RapidFire");
+				}
+				else {
+					return ResolveState("NormalFire");
+				}
+			}
+		NormalFire:
+			TPIF A 3 A_FireBullets(3, 3, 1, 5, "BulletPuff");
+			TPIS B 2;
+			TPIS C 2;
+			TPIS A 2 A_ReFire();
+			Goto Ready;
+		RapidFire:
+			TPIF A 1 A_FireBullets(3, 3, 1, 5, "BulletPuff");
+			TPIS B 1;
+			TPIS C 1;
+			TPIS A 1 A_ReFire();
+			Goto Ready;
+		Altfire:
+			TPIS A 10 {
+				invoker.fastMode = !invoker.fastMode;
+				A_PlaySound("weapons/shotgr");
+			}
+			Goto Ready;
+	}
+}
+
+</code></pre>
+<p>Give that a look and note the parts that horrify and confuse you. Feel free to save that as <strong>zrapidpistol.zsc</strong> and see how it functions in-game. Pretty cool, huh? And without a single extra inventory item!</p>
+<p>Let's go through the additions that turn this from a humble peashooter into a ravening monster that can slay a Baron of Hell in under 5 seconds.</p>
+<pre><code>
+class ZRapidPistol : Weapon {
+	
+	bool fastMode;
+
+	property fastMode: fastMode;
+
+	default {
+		ZRapidPistol.fastMode False;
+		Scale 0.75;
+		Radius 20;
+		Height 16;
+		...
+</pre></code>
+<p>Our first addition is a variable that lets us track the firemode of the gun. Here, we're using a boolean value (true/false), but it could be a number, a string of characters, any variable type that ZScript supports.<br>
+Just below that, we set it up as a property, which lets us set an initial value in the <strong>default properties</strong> section. Personally, I always name properties the same as the variable, but it's not required - I could have called it "cheeseNozzles" if I wanted.<br>
+In the <strong>default properties</strong> section, we give the property its initial value - False. When this gun is first equipped, it will fire normally. Note that here, I have to use the class name to set this property. This will not always be the case.
+</p>
+<pre><code>
+	...
+	Fire:
+		TPIS A 1 {
+			if (invoker.fastMode) {
+				return ResolveState("RapidFire");
+			}
+			else {
+				return ResolveState("NormalFire");
+			}
+		}
+	NormalFire:
+		TPIF A 3 A_FireBullets(3, 3, 1, 5, "BulletPuff");
+		TPIS B 2;
+		TPIS C 2;
+		TPIS A 2 A_ReFire();
+		Goto Ready;
+	RapidFire:
+		TPIF A 1 A_FireBullets(3, 3, 1, 5, "BulletPuff");
+		TPIS B 1;
+		TPIS A 1 A_ReFire();
+		Goto Ready;
+	Altfire:
+		TPIS A 10 {
+			invoker.fastMode = !invoker.fastMode;
+			A_PlaySound("weapons/shotgr");
+		}
+		Goto Ready;
+	...
+</pre></code>
+<p>This is where your brain might be crisping a little bit if you're a dedicated DECORATE-head - What are all those curly braces? <em>invoker</em>? Isn't that a DOTA character?<br>
+One of ZScript's great advantages is that it functions more like a conventional programming language, and lets you use common programming structures (like if statements, loops, and so on) to control logic and flow. In the <strong>Fire</strong> state, we first check to see if the <strong>fastMode</strong> variable of the object that's running this state is True. If it is, we jump to the <strong>RapidFire</strong> state. Otherwise, we jump to the <strong>NormalFire</strong> state.<br>
+<strong>NormalFire</strong> is, well, just our previous fire state, renamed. Nothing unusual.<br>
+<strong>RapidFire</strong> has quite a few frames chopped out, but nothing revelatory.<br>
+The true magic is in <strong>AltFire</strong>. Think of it like this - this gun runs the <strong>AltFire</strong> state when the player you press the button bound to AltFire. When it runs, it takes the value of <strong>fastMode</strong>, inverts it (that's the !, the boolean inversion operator), and assigns that inverted value back to <strong>fastMode</strong>. If <strong>fastMode</strong> was True, it's now False, and vice versa.<br>
+Also, as a nice little detail, we play the shotgun cocking sound to signal to the player that they just switched fire modes.<br>
+Both of these operations are contained within a set of curly braces - this lets you execute as many things as you like in the same block of tics,  not to mention making it much easier to organize your code and frame timings.<br>
+The result of all this is that the gun toggles firemode when you press right-click (or whatever you bound altfire to), and when you fire, it's either very fast, or just normal speed.
+</p>
+<h3>Other Notes</h3>
+<p>The tactics presented here are not the only way to do these operations in ZScript. As a result of large amount of control ZScript offers, there is almost always more than one way to do something, and often several. For example, instead of creating and setting a property to get an initial value for fastMode, you could override the PostBeginPlay function and set it there -</p>
+<pre><code>
+override void PostBeginPlay() {
+		fastMode = false;
+		super.PostBeginPlay();
+	}
+
+</code></pre>
+<p>You could also just make sure fastMode isn't null when AltFire tries to invert it - the possibilities are legion.
+</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/marrub--/zscript-doc">The ZScript Documentation Project</a>. The best reference work for ZScript. Also the only one.</li>
+<li><a href="https://zdoom.org/wiki/">The ZDoom Wiki</a>. Another good reference, but it's not especially well maintained or linked up - The ZScript resources are largely orphaned, improperly indexed, or poorly named. They do exist, though!</li>
+<li><a href="https://github.com/coelckers/gzdoom/tree/master/wadsrc/static/zscript">The GZDoom Source Code</a>. When in doubt, go look at how the... maintainers... did it. I'm not going to tell you it's EASY to read, but it's the authoritative source for how to replicate vanilla behavior in ZScript.</li>
+<li><a href="https://forum.zdoom.org/">The ZDoom Forums</a>, specifically the <a href="https://forum.zdoom.org/viewforum.php?f=43">Gameplay Mods</a> and <a href="https://forum.zdoom.org/viewforum.php?f=19">Other Projects</a> sections. The best reference is exploring a working version! I don't advocate copying others' code wholesale, but it can be extremely helpful to see how someone else solved a thorny problem, or created an effect you'd love to replicate.</li>
+</ul>
+<h2>Thanks</h2>
+My own journey into ZScript would not have been possible without many others and the work they've done.
+
+
+In no particular order, I wish to thank:
+<ul>
+<li><a href="https://greyserv.net/">Alison Watson</a> for the many, many hours of work they spent on their <a href="https://github.com/marrub--/zscript-doc">ZScript Documentation Project</a>.</li>
+<li>iSpook, for getting me to write this. Hope it helps!</li>
+<li>Yholl and Kegan, for their insistence that DECORATE is just fine, thank you. </li>
+<li>Samarai1000, for your dedication to <em>gunfeel</em>.</li>
+<li>Karla, for Project Ironclad, and for tolerating my ranting.</li>
+<li>Any other denizens of the Secreta Lounge that I might have forgotten to acknowledge, for their inspiring work and assistance.</li>
+</ul>
+<br><br>
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+</html>

@@ -1,0 +1,346 @@
+<html>
+<head>
+	<style>
+	pre code {
+		font-family: monospace;
+		font-size: larger;
+		background-color: #ddd;
+		display: block;
+		padding: 1em;
+	}
+	html {
+		font-family: sans-serif;
+	}
+	</style>
+</head>
+
+<title>How 2 Make Monster Good (Also in ZScript)</title>
+<h1>How 2 Make Monster Good (Also in ZScript)</h1>
+
+<p>Welcome back, delicious friends, to the next installment of <strong>HOW 2</strong>, <strong>HOW 2 2: HEY NOW, YOU'RE A MONSTAR</strong>.<br><br>
+As the previous one did, this tutorial assumes several things:
+</p>
+<ul>
+<li>You did (or at least read) the previous tutorial - HOW 2 GNU BUT WITH ZSCRIPT</li>
+<li>You have created a monster for GZDoom, using DECORATE (or at least looked at the code for one).</li>
+<li>You have overcome (or at least come to terms with) <em>the fear</em> of ZScript for weapons...
+<li>...But now you want to make monsters, and it's like your first day of High School all over again, except it's Cacodemons and Barons all laughing at you and then they steal your keyboard and stuff you in a broom closet full of spaghetti.</li>
+</ul>
+<p>
+Assuming (some of) the above is true, we will begin with a historical artifact, as this has <em>technically</em> never existed in the GZDoom source - the DECORATE code for the standard Imp.</p>
+<pre><code>
+	ACTOR TutorialImp {
+		Health 60
+		Radius 20
+		Height 56
+		Mass 100
+		Speed 8
+		PainChance 200
+		Monster
+		+FLOORCLIP
+		SeeSound "imp/sight"
+		PainSound "imp/pain"
+		DeathSound "imp/death"
+		ActiveSound "imp/active"
+		HitObituary "%o was shredded by a tutorial imp!"
+		Obituary "%o was BBQed by a tutorial imp!"
+
+		States {
+			Spawn:
+				TROO AB 10 A_Look
+				Loop
+			See:
+				TROO AABBCCDD 3 A_Chase
+				Loop
+			Melee:
+			Missile:
+				TROO EF 8 A_FaceTarget
+				TROO G 6 A_TroopAttack
+				Goto See
+			Pain:
+				TROO H 2
+				TROO H 2 A_Pain
+				Goto See
+			Death:
+				TROO I 8
+				TROO J 8 A_Scream
+				TROO K 6
+				TROO L 6 A_NoBlocking
+				TROO M -1
+				Stop
+			XDeath:
+				TROO N 5
+				TROO O 5 A_XScream
+				TROO P 5
+				TROO Q 5 A_NoBlocking
+				TROO RST 5
+				TROO U -1
+				Stop
+			Raise:
+				TROO ML 8
+				TROO KJI 6
+				Goto See
+		}
+	}
+
+</code></pre>
+<p>Right now, this uses the standard Imp's sprites - Replacing them is another matter. You can find plenty of fun replacements at <a href="https://www.realm667.com">Realm 667</a>.<br>
+Take a minute to get this DECORATE version working before you move on. Confirm that everything is working as expected, or at least that you are aware of any existing issues.</p>
+<h2>A-scripting We Shall Go...</h2>
+<p>We shall now transmogrify this humble imp into... another humble imp in a different language.</p>
+<h3>Actor Definition</h3>
+<p>As before, we need to define this imp as a class. This time, though, we're subclassing Actor, not Weapon.
+<pre><code>
+class ZTutorialImp : Actor {
+
+</pre></code>
+</p>
+<h3>Properties</h3>
+<p>Next, we translate the properties of this imp into ZScript format. 
+<pre><code>
+	Default {
+		Health 60;
+		Radius 20;
+		Height 56;
+		Mass 100;
+		Speed 8;
+		PainChance 200;
+		Monster;
+		+FLOORCLIP
+		SeeSound "imp/sight";
+		PainSound "imp/pain";
+		DeathSound "imp/death";
+		ActiveSound "imp/active";
+		HitObituary "%o was shredded by a tutorial imp!";
+		Obituary "%o was BBQed by a tutorial imp!";
+	}
+	
+</pre></code>
+Common monster properties don't usually require much more than adding semicolons to the end of each line. As a quick refresher on the properties themselves:
+<ul>
+<li>Health is how much damage this monster can take before dying.</li>
+<li>Radius is half of how many map units wide the actor is (radius * 2 = diameter, if you recall geometry).</li>
+<li>Height is... how tall it is.</li>
+<li>Speed is how many map units the monster moves during one step in A_Chase().</li>
+<li>PainChance determines the chance the monster will enter its pain state if hit, equal to PainChance/256.</li>
+<li>Other properties are left as an exercise to the reader - There are a LOT of them, <a href="https://zdoom.org/wiki/Actor_properties">check here for more info</a>.</li>
+</ul>
+</p>
+<h3>States</h3>
+<p>States for monsters are how you determine their AI - you can very easily see how an imp behaves if you look at its states!
+<pre><code>
+	States {
+		Spawn:
+			TROO AB 10 A_Look();
+			Loop;
+		See:
+			TROO AABBCCDD 3 A_Chase();
+			Loop;
+		Melee:
+		Missile:
+			TROO EF 8 A_FaceTarget();
+			TROO G 6 A_TroopAttack();
+			Goto See;
+		Pain:
+			TROO H 2;
+			TROO H 2 A_Pain();
+			Goto See;
+		Death:
+			TROO I 8;
+			TROO J 8 A_Scream();
+			TROO K 6;
+			TROO L 6 A_NoBlocking();
+			TROO M -1;
+			Stop;
+		XDeath:
+			TROO N 5;
+			TROO O 5 A_XScream();
+			TROO P 5;
+			TROO Q 5 A_NoBlocking();
+			TROO RST 5;
+			TROO U -1;
+			Stop;
+		Raise:
+			TROO ML 8;
+			TROO KJI 6;
+			Goto See;
+	}
+
+</pre></code>
+As before, our 'magic keywords' are translated into function calls. However, there are a few strange ones in here - like A_TroopAttack().<br>
+It turns out that monsters have a lot more 'shortcut' functions in their code, usually because the functionality there was ported from native code. Just know that you can replicate all those with normal ZScript - and we will, later.</p>
+<h3>Sewing the patient up</h3>
+<p>End the file with a closing brace ( } ), and don't forget to add your new TutorialImp.zsc to your  <strong>ZSCRIPT</strong> file:
+<pre><code>
+#include "subdirectory/ztutorialimp.zsc"
+
+</code></pre>
+</p>
+<h3>Komm, süsser Code.</h3>
+<p>Launch GZDoom with our mod, and spawn our beautful baby imp: <strong>summon ztutorialimp</strong><br>
+Let him kill you, every child should enjoy at least one kill before you blast them into bits of re-allocated memory.</p>
+<h2>... I was promised eldrich... horrors? Can I go home?</h2>
+<p>No, no, you can't go yet! We have Such Sights To Show You.
+<pre><code>
+	class ZSuperImp : Actor {
+		Default {
+			Health 666000;
+			Radius 80;
+			Height 240;
+			Mass 1000;
+			Speed 4;
+			Scale 4;
+			PainChance 0;
+			Monster;
+			+FLOORCLIP
+			SeeSound "cyber/sight";
+			PainSound "cyber/pain";
+			DeathSound "cyber/death";
+			ActiveSound "cyber/active";
+			HitObituary "%o was erased by the great god imp.";
+			Obituary "%o was purified.";
+		}
+	
+		States {
+			Spawn:
+				TROO AB 10 A_Look();
+				Loop;
+			See:
+				TROO AABBCCDD 3 A_Chase();
+				Loop;
+			Melee:
+			Missile:
+				TROO EF 8 A_FaceTarget();
+				TROO G 6 A_SpawnProjectile("SuperImpBall", 150);
+				Goto See;
+			Death:
+				TROO I 8;
+				TROO J 8 A_Scream();
+				TROO K 6;
+				TROO L 6 A_NoBlocking();
+				TROO M -1;
+				Stop;
+		}
+	}
+	
+	class SuperImpBall : Actor {
+		Default {
+			Radius 32;
+			Height 32;
+			Speed 40;
+			Damage 30;
+			Scale 4;
+			Projectile;
+			+RANDOMIZE
+			+ZDOOMTRANS
+			RenderStyle "Add";
+			Alpha 1;
+			SeeSound "imp/attack";
+			DeathSound "weapons/bfgx";
+		}
+		States {
+			Spawn:
+			BFS1 AB 4 Bright;
+			Loop;
+		Death:
+			BFE1 ABC 8 Bright;
+			BFE1 DEF 8 Bright A_Explode(256, 512);
+			Stop;
+		}
+	}
+
+</code></pre>
+<p>Give that a gander. I highly recommend saving it as <strong>zsuperimp.zsc</strong> and spawning it. Oh, and be sure to enable god mode.</p>
+<p>As before, we'll step through the changes that turn the humble imp into the <em>GREAT GOD IMP</em>.</p>
+// ENDED HERE FOR NOW
+<pre><code>
+class ZRapidPistol : Weapon {
+	
+	bool fastMode;
+
+	property fastMode: fastMode;
+
+	default {
+		ZRapidPistol.fastMode False;
+		Scale 0.75;
+		Radius 20;
+		Height 16;
+		...
+</pre></code>
+<p>Our first addition is a variable that lets us track the firemode of the gun. Here, we're using a boolean value (true/false), but it could be a number, a string of characters, any variable type that ZScript supports.<br>
+Just below that, we set it up as a property, which lets us set an initial value in the <strong>default properties</strong> section. Personally, I always name properties the same as the variable, but it's not required - I could have called it "cheeseNozzles" if I wanted.<br>
+In the <strong>default properties</strong> section, we give the property its initial value - False. When this gun is first equipped, it will fire normally. Note that here, I have to use the class name to set this property. This will not always be the case.
+</p>
+<pre><code>
+	...
+	Fire:
+		TPIS A 1 {
+			if (invoker.fastMode) {
+				return ResolveState("RapidFire");
+			}
+			else {
+				return ResolveState("NormalFire");
+			}
+		}
+	NormalFire:
+		TPIF A 3 A_FireBullets(3, 3, 1, 5, "BulletPuff");
+		TPIS B 2;
+		TPIS C 2;
+		TPIS A 2 A_ReFire();
+		Goto Ready;
+	RapidFire:
+		TPIF A 1 A_FireBullets(3, 3, 1, 5, "BulletPuff");
+		TPIS B 1;
+		TPIS A 1 A_ReFire();
+		Goto Ready;
+	Altfire:
+		TPIS A 10 {
+			invoker.fastMode = !invoker.fastMode;
+			A_PlaySound("weapons/shotgr");
+		}
+		Goto Ready;
+	...
+</pre></code>
+<p>This is where your brain might be crisping a little bit if you're a dedicated DECORATE-head - What are all those curly braces? <em>invoker</em>? Isn't that a DOTA character?<br>
+One of ZScript's great advantages is that it functions more like a conventional programming language, and lets you use common programming structures (like if statements, loops, and so on) to control logic and flow. In the <strong>Fire</strong> state, we first check to see if the <strong>fastMode</strong> variable of the object that's running this state is True. If it is, we jump to the <strong>RapidFire</strong> state. Otherwise, we jump to the <strong>NormalFire</strong> state.<br>
+<strong>NormalFire</strong> is, well, just our previous fire state, renamed. Nothing unusual.<br>
+<strong>RapidFire</strong> has quite a few frames chopped out, but nothing revelatory.<br>
+The true magic is in <strong>AltFire</strong>. Think of it like this - this gun runs the <strong>AltFire</strong> state when the player you press the button bound to AltFire. When it runs, it takes the value of <strong>fastMode</strong>, inverts it (that's the !, the boolean inversion operator), and assigns that inverted value back to <strong>fastMode</strong>. If <strong>fastMode</strong> was True, it's now False, and vice versa.<br>
+Also, as a nice little detail, we play the shotgun cocking sound to signal to the player that they just switched fire modes.<br>
+Both of these operations are contained within a set of curly braces - this lets you execute as many things as you like in the same block of tics,  not to mention making it much easier to organize your code and frame timings.<br>
+The result of all this is that the gun toggles firemode when you press right-click (or whatever you bound altfire to), and when you fire, it's either very fast, or just normal speed.
+</p>
+<h3>Other Notes</h3>
+<p>The tactics presented here are not the only way to do these operations in ZScript. As a result of large amount of control ZScript offers, there is almost always more than one way to do something, and often several. For example, instead of creating and setting a property to get an initial value for fastMode, you could override the PostBeginPlay function and set it there -</p>
+<pre><code>
+override void PostBeginPlay() {
+		fastMode = false;
+		super.PostBeginPlay();
+	}
+
+</code></pre>
+<p>You could also just make sure fastMode isn't null when AltFire tries to invert it - the possibilities are legion.
+</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/marrub--/zscript-doc">The ZScript Documentation Project</a>. The best reference work for ZScript. Also the only one.</li>
+<li><a href="https://zdoom.org/wiki/">The ZDoom Wiki</a>. Another good reference, but it's not especially well maintained or linked up - The ZScript resources are largely orphaned, improperly indexed, or poorly named. They do exist, though!</li>
+<li><a href="https://github.com/coelckers/gzdoom/tree/master/wadsrc/static/zscript">The GZDoom Source Code</a>. When in doubt, go look at how the... maintainers... did it. I'm not going to tell you it's EASY to read, but it's the authoritative source for how to replicate vanilla behavior in ZScript.</li>
+<li><a href="https://forum.zdoom.org/">The ZDoom Forums</a>, specifically the <a href="https://forum.zdoom.org/viewforum.php?f=43">Gameplay Mods</a> and <a href="https://forum.zdoom.org/viewforum.php?f=19">Other Projects</a> sections. The best reference is exploring a working version! I don't advocate copying others' code wholesale, but it can be extremely helpful to see how someone else solved a thorny problem, or created an effect you'd love to replicate.</li>
+</ul>
+<h2>Thanks</h2>
+My own journey into ZScript would not have been possible without many others and the work they've done.
+
+
+In no particular order, I wish to thank:
+<ul>
+<li><a href="https://greyserv.net/">Alison Watson</a> for the many, many hours of work they spent on their <a href="https://github.com/marrub--/zscript-doc">ZScript Documentation Project</a>.</li>
+<li>iSpook, for getting me to write this. Hope it helps!</li>
+<li>Yholl and Kegan, for their insistence that DECORATE is just fine, thank you. </li>
+<li>Samarai1000, for your dedication to <em>gunfeel</em>.</li>
+<li>Karla, for Project Ironclad, and for tolerating my ranting.</li>
+<li>Any other denizens of the Secreta Lounge that I might have forgotten to acknowledge, for their inspiring work and assistance.</li>
+</ul>
+<br><br>
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+</html>

@@ -1,11 +1,5 @@
-#include "mfdecorate/tutorialpistol.dec"
-#include "mfdecorate/handgun.dec"
-#include "mfdecorate/testplayer.dec"
-//#include "mfdecorate/laspistol.dec"
-//#include "mfdecorate/chainrail.dec"
-//#include "mfdecorate/gowshotgun.dec"
-//#include "mfdecorate/beedoken.dec"
-//#include "mfdecorate/spinrifle.dec"
-//#include "mfdecorate/bouncep.dec"
-//#include "mfdecorate/lawgiver.dec"
-//EOF
+// DECORATE
+#include "script/tutorialpistol.dec"
+#include "script/tutorialimp.dec"
+
+//eof

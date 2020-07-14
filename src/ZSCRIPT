@@ -1,41 +1,44 @@
 version "3.4"
 // prototypes
-#include "mfzscript/mfweapon.zsc"
+#include "script/mfweapon.zs"
 
 //player
-//#include "mfzscript/labrat.zsc"
-//#include "mfzscript/labpistol.zsc"
-//#include "mfzscript/injector.zsc"
+#include "script/labrat.zs"
+#include "script/labpistol.zs"
+#include "script/injector.zs"
 
 //rebalance
-//#include "mfzscript/rbl/fist.zsc"
-//#include "mfzscript/rbl/pistol.zsc"
-//#include "mfzscript/rbl/shotgun.zsc"
-//#include "mfzscript/rbl/chaingun.zsc"
-//#include "mfzscript/rbl/rocket.zsc"
-//#include "mfzscript/rbl/plasma.zsc"
-//#include "mfzscript/rbl/ssg.zsc"
-//#include "mfzscript/rbl/bfg.zsc"
+//#include "script/rbl/fist.zs"
+//#include "script/rbl/pistol.zs"
+//#include "script/rbl/shotgun.zs"
+//#include "script/rbl/chaingun.zs"
+//#include "script/rbl/rocket.zs"
+//#include "script/rbl/plasma.zs"
+//#include "script/rbl/ssg.zs"
+//#include "script/rbl/bfg.zs"
 
 
 //weapons
-#include "mfzscript/grenade.zsc"
-#include "mfzscript/lawgiver.zsc"
-#include "mfzscript/scatterpistol.zsc"
-#include "mfzscript/bloodtester.zsc"
-#include "mfzscript/bullgut.zsc"
-#include "mfzscript/turipist.zsc"
-#include "mfzscript/axe.zsc"
-#include "mfzscript/colorgun.zsc"
-#include "mfzscript/dualies.zsc"
-#include "mfzscript/glack.zsc"
-#include "mfzscript/ztutorialpistol.zsc"
-#include "mfzscript/zrapidpistol.zsc"
+#include "script/grenade.zs"
+//#include "script/lawgiver.zs"
+#include "script/scatterpistol.zs"
+#include "script/bloodtester.zs"
+#include "script/bullgut.zs"
+#include "script/turipist.zs"
+#include "script/axe.zs"
+#include "script/colorgun.zs"
+#include "script/dualies.zs"
+#include "script/glack.zs"
+#include "script/ztutorialpistol.zs"
+#include "script/zrapidpistol.zs"
 
 
 // enemies
-//#include "mfzscript/superrev.zsc"
-//#include "mfzscript/chaserbarrel.zsc"
+//#include "script/superrev.zs"
+//#include "script/chaserbarrel.zs"
+//#include "script/impmorph.zs"
+#include "script/ztutorialimp.zs"
+#include "script/zsuperimp.zs"
 
 
 //eof
