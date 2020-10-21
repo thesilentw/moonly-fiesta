@@ -31,6 +31,7 @@ version "3.4"
 #include "script/glack.zs"
 #include "script/ztutorialpistol.zs"
 #include "script/zrapidpistol.zs"
+#include "script/togglepistol.zs"
 
 
 // enemies
@@ -39,6 +40,7 @@ version "3.4"
 //#include "script/impmorph.zs"
 #include "script/ztutorialimp.zs"
 #include "script/zsuperimp.zs"
+#include "script/zsmartimp.zs"
 
 
 //eof

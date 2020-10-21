@@ -3,7 +3,7 @@ class ZSuperImp : Actor {
 	Default {
 		Health 666000;
 		Radius 80;
-		Height 240;
+		Height 224;
 		Mass 1000;
 		Speed 4;
 		Scale 4;
@@ -25,7 +25,6 @@ class ZSuperImp : Actor {
 		See:
 			TROO AABBCCDD 3 A_Chase();
 			Loop;
-		Melee:
 		Missile:
 			TROO EF 8 A_FaceTarget();
 			TROO G 6 A_SpawnProjectile("SuperImpBall", 150);
